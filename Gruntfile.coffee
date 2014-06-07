@@ -216,6 +216,7 @@ module.exports = (grunt) ->
           vendorPaths.concat [
             "#{appsdk_path}/builds/lib/analytics/analytics-all.js"
             "#{appsdk_path}/builds/lib/closure/closure-all.js"
+            "#{appsdk_path}/builds/lib/gantt/gantt-all.js"
 
             # Enable Ext Loader
             'test/support/ExtLoader.js'
@@ -259,6 +260,7 @@ module.exports = (grunt) ->
           "#{appsdk_path}/builds/rui/resources/css/rui-fonts.css"
           "#{appsdk_path}/builds/lib/closure/closure-20130117-r2446.css"
           "#{appsdk_path}/builds/rui/resources/css/lib-closure.css"
+          "#{appsdk_path}/builds/lib/gantt/resources/css/sch-gantt-all.css",
           'build/resources/css/catalog-all.css'
         ]
         host: "http://127.0.0.1:#{inlinePort}/"
@@ -367,7 +369,7 @@ module.exports = (grunt) ->
             if debug then '-d' else ''
             "-s #{ext_path}"
             'compile'
-            "-classpath=#{appsdk_path}/builds/sdk-dependencies-debug.js,#{appsdk_path}/src,src/apps"
+            "-classpath=#{appsdk_path}/builds/sdk-dependencies-debug.js,#{appsdk_path}/src,src/apps,#{appsdk_path}/builds/lib/gantt/gantt-all-debug.js,src/apps"
             'exclude -all and'
             'include -file src/apps and'
             'concat build/catalog-all-debug.js and'
@@ -378,7 +380,7 @@ module.exports = (grunt) ->
           args:[
             "-s #{ext_path}"
             'compile'
-            "-classpath=#{appsdk_path}/builds/sdk-dependencies-debug.js,#{appsdk_path}/src,src/apps"
+            "-classpath=#{appsdk_path}/builds/sdk-dependencies-debug.js,#{appsdk_path}/src,#{appsdk_path}/builds/lib/gantt/gantt-all-debug.js,src/apps"
             'exclude -all and'
             "union -r -file #{grunt.option('app')}/ and"
             "exclude -file #{appsdk_path}/builds/sdk-dependencies-debug.js and"
