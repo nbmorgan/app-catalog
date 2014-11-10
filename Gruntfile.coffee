@@ -50,7 +50,7 @@ module.exports = (grunt) ->
   maps = grunt.option 'maps' || false
 
   appsdk_path = 'lib/sdk'
-  ext_path = 'lib/ext/4.2.2'
+  ext_path = 'lib/ext/4.2.3'
   served_paths = [path.resolve(__dirname)]
   if process.env.APPSDK_PATH
     appsdk_path = path.join process.env.APPSDK_PATH, 'rui'
@@ -156,7 +156,7 @@ module.exports = (grunt) ->
           vendor: (->
             if process.env.APPSDK_PATH?
               vendorPaths = [
-                "lib/ext/4.2.2/ext-all-debug.js"
+                "lib/ext/4.2.3/ext-all-debug.js"
                 "#{appsdk_path}/builds/sdk-dependencies.js"
                 "#{appsdk_path}/src/Ext-more.js"
               ]
