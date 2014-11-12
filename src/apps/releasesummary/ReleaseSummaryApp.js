@@ -138,6 +138,7 @@
         },
 
         _getGridConfig: function(config) {
+            var context = this.getContext();
             return Ext.apply({
                 xtype: 'rallytreegrid',
                 style: {
@@ -149,7 +150,8 @@
                     'Name',
                     'ScheduleState'
                 ],
-                bufferedRenderer: this.getContext().isFeatureEnabled('S69537_BUFFERED_RENDERER_TREE_GRID')
+                bufferedRenderer: context.isFeatureEnabled('S69537_BUFFERED_RENDERER_TREE_GRID'),
+                expandAllInColumnHeaderEnabled: context.isFeatureEnabled('S77241_SHOW_EXPAND_ALL_IN_GRID_HEADER')
             }, config);
         },
 

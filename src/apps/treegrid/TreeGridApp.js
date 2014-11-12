@@ -110,6 +110,7 @@
 
         _getGridConfig: function(gridStore, context, stateId) {
             var gridListeners = {};
+
             if (this.loadGridAfterStateRestore) {
                 gridListeners = {
                     'staterestore': {
@@ -133,17 +134,14 @@
                 columnCfgs: this.getSetting('columnNames') || this.columnNames,
                 summaryColumns: [],
                 enableBulkEdit: true,
-                plugins: [],
+                plugins: ['rallytreegridexpandedrowpersistence'],
                 stateId: stateId,
                 stateful: true,
                 alwaysShowDefaultColumns: false,
                 listeners: gridListeners,
-                bufferedRenderer: this.getContext().isFeatureEnabled('S69537_BUFFERED_RENDERER_TREE_GRID')
+                bufferedRenderer: context.isFeatureEnabled('S69537_BUFFERED_RENDERER_TREE_GRID'),
+                expandAllInColumnHeaderEnabled: context.isFeatureEnabled('S77241_SHOW_EXPAND_ALL_IN_GRID_HEADER')
             };
-
-            gridConfig.plugins.push({
-                ptype: 'rallytreegridexpandedrowpersistence'
-            });
 
             return gridConfig;
         },

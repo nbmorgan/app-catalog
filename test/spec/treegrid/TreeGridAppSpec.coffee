@@ -45,7 +45,7 @@ describe 'Rally.apps.treegrid.TreeGridApp', ->
   it 'should use the row expansion plugin', ->
     treeGridApp = @createTreeGridApp()
     plugins = treeGridApp.down('#gridBoard').gridConfig.plugins
-    expect(_.find(plugins, ptype: 'rallytreegridexpandedrowpersistence')).toBeTruthy()
+    expect(_.contains(plugins, 'rallytreegridexpandedrowpersistence')).toBeTruthy()
     treeGridApp.destroy()
 
   it 'should accept model strings', ->
