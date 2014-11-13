@@ -646,6 +646,11 @@
                     field: 'TaskRemainingTotal',
                     type: 'sum',
                     units: taskUnitName
+                },
+                {
+                    field: 'TaskActualTotal',
+                    type: 'sum',
+                    units: taskUnitName
                 }
             ];
         },
