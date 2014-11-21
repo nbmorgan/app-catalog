@@ -32,7 +32,7 @@
                     },
                     {
                         xtype: 'radiogroup',
-                        id: 'whattoprint',
+                        itemId: 'whattoprint',
                         vertical: true,
                         columns: 1,
                         height: 70,
@@ -53,9 +53,8 @@
                     },
                     {
                         xtype: 'container',
-                        html: '<div class="icon-warning alert"></div> Print is limited to 200 work items.',
                         cls: config.showWarning ? 'print-warning' : 'print-warning rly-hidden',
-                        itemId: 'tooManyItems'
+                        html: '<div class="icon-warning alert"></div> Print is limited to 200 work items.'
                     }
                 ]
             }, config)]);
@@ -81,12 +80,8 @@
         },
 
         _buildStoreConfig: function() {
-            var includeChildren = Ext.getCmp('whattoprint').getChecked()[0].inputValue === 'includechildren';
+            var includeChildren = this.down('#whattoprint').getChecked()[0].inputValue === 'includechildren';
             var gridStore = this.grid.getStore();
-            var fetch = gridStore.fetch;
-            var filters = gridStore.filters ? gridStore.filters.items : [];
-            var sorters = gridStore.getSorters();
-
             return {
                 models: ['User Story', 'Defect', 'Defect Suite', 'Test Set'],
                 autoLoad: false,
@@ -95,9 +90,9 @@
                 root: {expanded: includeChildren},
                 enableHierarchy: includeChildren,
                 childPageSizeEnabled: false,
-                fetch: fetch,
-                filters: filters,
-                sorters: sorters,
+                fetch: gridStore.fetch,
+                filters: gridStore.filters ? gridStore.filters.items : [],
+                sorters: gridStore.getSorters(),
                 listeners: {
                     load: this._onStoreLoad,
                     scope: this
@@ -127,8 +122,7 @@
         },
 
         _onDataReady: function() {
-            var timeboxScopeRecord = this.timeboxScope.getRecord();
-            var iterationName = timeboxScopeRecord ? timeboxScopeRecord.get('Name') : 'Unscheduled';
+            var iterationName = this.timeboxScope.getRecord() ? this.timeboxScope.getRecord().get('Name') : 'Unscheduled';
             var treeGridPrinter = Ext.create('Rally.ui.grid.TreeGridPrinter', {
                 records: this.allRecords,
                 grid: this.grid,
