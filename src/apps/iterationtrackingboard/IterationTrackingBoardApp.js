@@ -457,15 +457,11 @@
         },
 
         _printHandler: function() {
-            var gridBoard = this.queryById('gridBoard');
-            var gridOrBoard = gridBoard.getGridOrBoard();
-            var totalRows = gridOrBoard.store.totalCount;
             var timeboxScope = this.getContext().getTimeboxScope();
 
             Ext.create('Rally.ui.grid.TreeGridPrintDialog', {
-                grid: gridOrBoard,
+                grid: this.queryById('gridBoard').getGridOrBoard(),
                 models: ['User Story', 'Defect', 'Defect Suite', 'Test Set'],
-                showWarning: totalRows > 200,
                 treeGridPrinterConfig: {
                     largeHeaderText: 'Iteration Summary',
                     smallHeaderText: timeboxScope.getRecord() ? timeboxScope.getRecord().get('Name') : 'Unscheduled'
