@@ -125,8 +125,7 @@ describe 'Rally.apps.iterationtrackingboard.PrintDialog', ->
 
     it 'should print children', ->
       radio = @dialog.items.items[1]
-      radio.setValue
-        reportType: 'includechildren'
+      radio.setValue reportType: 'includechildren'
       @clickPrint()
       expect(@ajaxStub).toHaveBeenCalledTwice()
 

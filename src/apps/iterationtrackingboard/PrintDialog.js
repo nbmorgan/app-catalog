@@ -47,7 +47,6 @@
                     },
                     {
                         boxLabel: 'Summary list of work items with children',
-                        id: 'printDialogReportTypeIncludeChildren',
                         name: 'reportType',
                         inputValue: 'includechildren'
                     }
