@@ -462,7 +462,7 @@
             var totalRows = gridOrBoard.store.totalCount;
             var timeboxScope = this.getContext().getTimeboxScope();
 
-            Ext.create('Rally.apps.iterationtrackingboard.PrintDialog', {
+            Ext.create('Rally.ui.grid.TreeGridPrintDialog', {
                 showWarning: totalRows > 200,
                 timeboxScope: timeboxScope,
                 grid: gridOrBoard
