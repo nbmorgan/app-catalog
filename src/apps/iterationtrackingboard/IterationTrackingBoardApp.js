@@ -463,9 +463,13 @@
             var timeboxScope = this.getContext().getTimeboxScope();
 
             Ext.create('Rally.ui.grid.TreeGridPrintDialog', {
+                grid: gridOrBoard,
+                models: ['User Story', 'Defect', 'Defect Suite', 'Test Set'],
                 showWarning: totalRows > 200,
-                timeboxScope: timeboxScope,
-                grid: gridOrBoard
+                treeGridPrinterConfig: {
+                    largeHeaderText: 'Iteration Summary',
+                    smallHeaderText: timeboxScope.getRecord() ? timeboxScope.getRecord().get('Name') : 'Unscheduled'
+                }
             });
         },
 
