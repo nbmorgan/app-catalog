@@ -1,22 +1,17 @@
 Ext = window.Ext4 || window.Ext
 
-Ext.require [
-  'Rally.apps.iterationtrackingboard.PrintDialog'
-]
-
 describe 'Rally.apps.iterationtrackingboard.PrintDialog', ->
   helpers
     createDialog: (options = {}) ->
-      @dialog = Ext.widget
-        xtype: 'iterationprogessappprintdialog'
-        showWarning: options.showWarning
-        timeboxScope: Ext.create 'Rally.app.TimeboxScope', record: @mom.getRecord 'iteration'
+      @dialog = Ext.create 'Rally.apps.iterationtrackingboard.PrintDialog',
         grid:
           getStore: ->
             getSorters: -> ['testSorter']
             fetch: ['testFetch']
             filters: items: ['test', 'filters']
             parentTypes: ['test', 'parent', 'types']
+        showWarning: options.showWarning
+        timeboxScope: Ext.create 'Rally.app.TimeboxScope', record: @mom.getRecord 'iteration'
 
     clickCancel: ->
       @dialog.dockedItems.items[1].items.items[1].handler.call(@dialog)

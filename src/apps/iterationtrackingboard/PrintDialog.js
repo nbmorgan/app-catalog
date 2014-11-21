@@ -6,101 +6,65 @@
     * shows print dialog for Iteration Progress App
     */
     Ext.define('Rally.apps.iterationtrackingboard.PrintDialog', {
-        extend: 'Rally.ui.dialog.Dialog',
         alias:'widget.iterationprogessappprintdialog',
-        requires: [
-            'Rally.ui.Button'
-        ],
-        config: {
-            autoShow: true,
-            draggable: true,
-            disableScroll: true,
-            width: 520,
-            height: 300,
-            closable: true,
-            title: 'Print'
-        },
+        extend: 'Rally.ui.dialog.PrintDialog',
+        requires: ['Ext.form.RadioGroup', 'Rally.ui.Button'],
+
+        autoShow: true,
+        cls: 'iteration-progress-dialog print-dialog',
+        height: 300,
         layout: {
             type: 'vbox',
             align: 'left'
         },
-        cls: 'iteration-progress-dialog print-dialog',
-        items: [
-            {
-                xtype: 'container',
-                html: 'What would you like to print?',
-                cls: 'dialog-title'
-            },
-            {
-                xtype: 'radiogroup',
-                id: 'whattoprint',
-                vertical: true,
-                columns: 1,
-                height: 70,
-                width: 470,
-                items: [
-                    {
-                        boxLabel: 'Summary list of work items',
-                        name: 'reportType',
-                        inputValue: 'summary',
-                        checked: true
-                    },
-                    {
-                        boxLabel: 'Summary list of work items with children',
-                        name: 'reportType',
-                        inputValue: 'includechildren'
-                    }
-                ]
-            }
-        ],
-        constructor: function(config) {
-            this.initConfig(config || {});
-            this.timeboxScope = this.config.timeboxScope;
+        width: 520,
 
+        constructor: function(config) {
             this.nodesToExpand = [];
             this.allRecords = [];
 
-            this.callParent(arguments);
+            this.callParent([Ext.merge({
+                items: [
+                    {
+                        xtype: 'container',
+                        html: 'What would you like to print?',
+                        cls: 'dialog-title'
+                    },
+                    {
+                        xtype: 'radiogroup',
+                        id: 'whattoprint',
+                        vertical: true,
+                        columns: 1,
+                        height: 70,
+                        width: 470,
+                        items: [
+                            {
+                                boxLabel: 'Summary list of work items',
+                                name: 'reportType',
+                                inputValue: 'summary',
+                                checked: true
+                            },
+                            {
+                                boxLabel: 'Summary list of work items with children',
+                                name: 'reportType',
+                                inputValue: 'includechildren'
+                            }
+                        ]
+                    },
+                    {
+                        xtype: 'container',
+                        html: '<div class="icon-warning alert"></div> Print is limited to 200 work items.',
+                        cls: config.showWarning ? 'print-warning' : 'print-warning rly-hidden',
+                        itemId: 'tooManyItems'
+                    }
+                ]
+            }, config)]);
         },
 
         initComponent: function() {
-            var warningTextClasses = this.showWarning ? 'print-warning' : 'print-warning rly-hidden';
-            this.items.push({
-                xtype: 'container',
-                html: '<div class="icon-warning alert"></div> Print is limited to 200 work items.',
-                cls: warningTextClasses,
-                itemId: 'tooManyItems'
-            });
-
-            this.dockedItems = [{
-                xtype: 'toolbar',
-                dock: 'bottom',
-                layout: {
-                    type: 'hbox',
-                    pack: 'center'
-                },
-                ui: 'footer',
-                itemId: 'footer',
-                defaults: {
-                    xtype: 'rallybutton',
-                    padding: '4 12',
-                    scope: this
-                },
-                items: [
-                    {
-                        text: 'Print',
-                        cls: 'primary medium',
-                        handler: this._handlePrintClick
-                    },
-                    {
-                        text: 'Cancel',
-                        cls: 'secondary medium',
-                        handler: this._handleCancelClick
-                    }
-                ]
-            }];
-
             this.callParent(arguments);
+
+            this.on('print', this._handlePrintClick, this);
         },
 
         _handlePrintClick: function() {
@@ -114,10 +78,6 @@
                 },
                 scope: this
             });
-        },
-
-        _handleCancelClick: function(target, e) {
-            this.destroy();
         },
 
         _buildStoreConfig: function() {

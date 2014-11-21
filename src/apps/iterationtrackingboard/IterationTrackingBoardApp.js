@@ -36,7 +36,6 @@
             'Rally.apps.iterationtrackingboard.StatsBanner',
             'Rally.apps.iterationtrackingboard.StatsBannerField',
             'Rally.clientmetrics.ClientMetricsRecordable',
-            'Rally.apps.iterationtrackingboard.PrintDialog',
             'Rally.apps.common.RowSettingsField'
         ],
 
