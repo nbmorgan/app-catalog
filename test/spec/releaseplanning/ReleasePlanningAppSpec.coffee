@@ -51,7 +51,7 @@ describe 'Rally.apps.releaseplanning.ReleasePlanningApp', ->
     expect(@getColumn(1).getCards()[0].getRecord().get('Name')).toBe @featureData[0].Name
 
   it 'should show a progress bar based on preliminary estimate and planned velocity', ->
-    expect(@getProgressBarHtml(1)).toContain '12 of Set Planned Velocity (20)'
+    expect(@getProgressBarHtml(1)).toContain '12 of <a href="#">Set Planned Velocity</a> (20)'
 
   it 'should order the release columns based on end date', ->
     sortedReleaseNames = _.pluck _.sortBy(@releaseData, (release) -> new Date(release.ReleaseDate)), 'Name'
