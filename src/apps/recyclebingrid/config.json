@@ -1,0 +1,9 @@
+{
+   "name": "Recycle Bin",
+   "className": "Rally.apps.recyclebingrid.RecycleBinGridApp",
+   "server": "https://rally1.rallydev.com",
+   "sdk": "x",
+   "javascript": [
+      "RecycleBinGridApp.js"
+   ]
+}
