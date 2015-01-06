@@ -38,6 +38,7 @@
             'Rally.clientmetrics.ClientMetricsRecordable',
             'Rally.apps.common.RowSettingsField'
         ],
+        layout: 'hbox',
 
         mixins: [
             'Rally.clientmetrics.ClientMetricsRecordable'
@@ -84,9 +85,9 @@
                 grid.fireEvent('storecurrentpagereset');
             }
 
-            if (this._shouldShowStatsBanner()){
-                this._addStatsBanner();
-            }
+            //if (this._shouldShowStatsBanner()){
+            //    this._addStatsBanner();
+            //}
 
             this._buildGridStore().then({
                 success: function(gridStore) {
@@ -199,7 +200,7 @@
                 modelNames: this.modelNames,
                 cardBoardConfig: this._getBoardConfig(),
                 gridConfig: this._getGridConfig(gridStore),
-                layout: 'anchor',
+                region: 'center',
                 storeConfig: {
                     useShallowFetch: false,
                     filters: this._getGridboardFilters(gridStore.model)
