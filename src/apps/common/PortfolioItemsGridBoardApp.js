@@ -221,13 +221,7 @@
             if (this._pickerTypeChanged(picker)) {
                 this.currentType = newType;
                 this.modelNames = [newType.get('TypePath')];
-
-                this.gridboard.fireEvent('modeltypeschange', this.gridboard, [newType]);
-                if (this.toggleState === 'grid') {
-                    this.gridboard.applyCustomFilter({types: this.modelNames});
-                } else {
-                    this.loadGridBoard();
-                }
+                this.gridboard.changeModelTypes(this.modelNames);
             }
         },
 

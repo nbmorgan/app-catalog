@@ -4,7 +4,10 @@
     Ext.define('Rally.apps.customgridboard.CustomGridBoardApp', {
         extend: 'Rally.app.GridBoardApp',
         alias: 'widget.customgridboardapp',
-        requires: ['Rally.ui.gridboard.plugin.GridBoardCustomView'],
+        requires: [
+            'Rally.ui.gridboard.plugin.GridBoardCustomView',
+            'Rally.ui.gridboard.plugin.GridBoardModelPicker'
+        ],
         statePrefix: 'customGridBoard',
         config: {
             enableGridBoardToggle: true,
@@ -22,6 +25,10 @@
                 {
                     ptype: 'rallygridboardcustomview',
                     stateId: this.getStateId()
+                },
+                {
+                    ptype: 'rallygridboardmodelpicker',
+                    stateId: this.getScopedStateId('model-picker')
                 }
             ]);
         }
