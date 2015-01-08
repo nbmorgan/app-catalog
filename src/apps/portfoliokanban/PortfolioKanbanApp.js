@@ -22,7 +22,7 @@
         autoScroll: false,
         appName: 'Portfolio Kanban',
         cls: 'portfolio-kanban',
-        stateName: 'kanban',
+        statePrefix: 'portfolio-kanban',
 
         config: {
             toggleState: 'board',

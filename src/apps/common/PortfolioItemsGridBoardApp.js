@@ -39,10 +39,6 @@
             return this.callParent(arguments).concat(this.piTypePicker);
         },
 
-        getStateId: function () {
-            return 'portfolio-' + this.stateName;
-        },
-
         getFilterControlConfig: function () {
             return {
                 blackListFields: ['PortfolioItemType'],

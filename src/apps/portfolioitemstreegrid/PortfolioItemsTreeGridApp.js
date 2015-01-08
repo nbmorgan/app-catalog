@@ -12,7 +12,7 @@
         ],
 
         componentCls: 'pitreegrid',
-        stateName: 'tree',
+        statePrefix: 'portfolio-tree',
 
         config: {
             toggleState: 'grid',
