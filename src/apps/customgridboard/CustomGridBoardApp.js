@@ -17,28 +17,8 @@
         },
 
         loadModelNames: function () {
-            return Deft.Promise.when(this.getSetting('modelNames') || []);
-        },
-
-        loadGridBoard: function () {
-            if (this.modelNames.length) {
-                this.callParent(arguments);
-            } else {
-                Ext.create('Rally.ui.popover.Popover', {
-                    target: this.getEl(),
-                    items: [
-                        this._createModelPicker(),
-                        {
-                            xtype: 'rallybutton',
-                            itemId: 'acceptbutton',
-                            text: 'Accept',
-                            style: {
-                                float: 'right'
-                            }
-                        }
-                    ]
-                });
-            }
+            var modelNames = this.getSetting('modelNames');
+            return Deft.Promise.when(_.isString(modelNames) ? Ext.JSON.decode(modelNames) : modelNames);
         },
 
         getHeaderControls: function () {
@@ -63,7 +43,7 @@
                     'WorkspacePermission'
                 ],
                 fieldLabel: 'Types',
-                labelWidth: 30,
+                labelWidth: 34,
                 margin: '0',
                 value: this.modelNames,
                 width: 250,
@@ -72,15 +52,44 @@
                         var selectedModels = picker.getSubmitValue();
                         if (selectedModels.length && this._selectedModelsAreDifferent(selectedModels)) {
                             picker.resetOriginalValue();
-                            this.modelNames = selectedModels;
-                            this.gridboard.changeModelTypes(_.clone(this.modelNames));
-                            this.loadGridBoard();
+                            this.changeTypes(selectedModels);
+                        } else {
+                            picker.reset();
+                            picker.syncSelectionText();
                         }
                     },
                     scope: this
                 }
             }, options));
             return this.modelPicker;
+        },
+
+        changeTypes: function (newTypes) {
+            var oldTypes = this.modelNames;
+            this.modelNames = _.clone(newTypes);
+            this.gridboard.changeModelTypes(_.clone(newTypes));
+
+            if (!this._areArtifacts(oldTypes) || !this._areArtifacts(newTypes)) {
+                this._setDefaultColumns();
+            }
+
+            this.updateSettingsValues({
+                settings: {
+                    modelNames: Ext.JSON.encode(newTypes)
+                }
+            });
+
+            this.loadGridBoard();
+        },
+
+        _setDefaultColumns: function () {
+            debugger;
+        },
+
+        _areArtifacts: function (types) {
+            return _.any(types, function (type) {
+                return Rally.data.ModelTypes.isArtifact(type);
+            });
         },
 
         _selectedModelsAreDifferent: function (selectedModels) {
