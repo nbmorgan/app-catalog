@@ -53,7 +53,7 @@
                 listeners: {
                     collapse: function (picker) {
                         var selectedModels = picker.getSubmitValue();
-                        if (selectedModels.length && _.difference(selectedModels, this.modelNames).length > 0) {
+                        if (selectedModels.length && this._selectedModelsAreDifferent(selectedModels)) {
                             picker.resetOriginalValue();
                             this.modelNames = selectedModels;
                             this.loadGridBoard();
@@ -63,6 +63,14 @@
                 }
             }, options));
             return this.modelPicker;
+        },
+
+        _selectedModelsAreDifferent: function (selectedModels) {
+            var normalizedCurrentModels = _.map(this.modelNames, function (model) { return model.toLowerCase(); });
+            var normalizedSelectedModels = _.map(selectedModels, function (model) { return model.toLowerCase(); });
+
+            return normalizedCurrentModels.length != normalizedSelectedModels.length ||
+                _.intersection(normalizedCurrentModels, normalizedSelectedModels).length != normalizedCurrentModels.length;
         },
 
         getGridBoardPlugins: function () {
