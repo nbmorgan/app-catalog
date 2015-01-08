@@ -10,7 +10,7 @@
         ],
         statePrefix: 'customGridBoard',
         config: {
-            enableGridBoardToggle: true,
+            enableGridBoardToggle: false,
             defaultSettings: {
                 modelNames: ['hierarchicalrequirement']
             }
@@ -47,15 +47,18 @@
 
         _createModelPicker: function (options) {
             this.modelPicker = Ext.create('Rally.ui.picker.ModelTypePicker', _.merge({
-                margin: '0 9 0 0',
+                fieldLabel: 'Types',
+                labelWidth: 30,
+                margin: '0',
                 value: this.modelNames,
-                width: 200,
+                width: 250,
                 listeners: {
                     collapse: function (picker) {
                         var selectedModels = picker.getSubmitValue();
                         if (selectedModels.length && this._selectedModelsAreDifferent(selectedModels)) {
                             picker.resetOriginalValue();
                             this.modelNames = selectedModels;
+                            this.gridboard.changeModelTypes(_.clone(this.modelNames));
                             this.loadGridBoard();
                         }
                     },
