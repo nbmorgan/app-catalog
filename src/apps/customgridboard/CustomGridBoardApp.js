@@ -47,6 +47,21 @@
 
         _createModelPicker: function (options) {
             this.modelPicker = Ext.create('Rally.ui.picker.ModelTypePicker', _.merge({
+                blackListTypes: [
+                    'AllowedAttributeValue',
+                    'Attachment',
+                    'AttachmentContent',
+                    'AttributeDefinition',
+                    'ConversationPost',
+                    'Preference',
+                    'ProjectPermission',
+                    'ScheduledTestCase',
+                    'State',
+                    'TypeDefinition',
+                    'WebLinkDefinition',
+                    'Workspace',
+                    'WorkspacePermission'
+                ],
                 fieldLabel: 'Types',
                 labelWidth: 30,
                 margin: '0',
