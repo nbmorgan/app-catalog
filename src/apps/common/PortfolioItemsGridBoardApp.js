@@ -35,6 +35,13 @@
             });
         },
 
+        addGridBoard: function () {
+            if (this.gridboard && this.piTypePicker && this.piTypePicker.rendered) {
+                this.piTypePicker.up().remove(this.piTypePicker, false);
+            }
+            this.callParent(arguments);
+        },
+
         getHeaderControls: function () {
             return this.callParent(arguments).concat(this.piTypePicker);
         },
