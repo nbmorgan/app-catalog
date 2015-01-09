@@ -5,10 +5,10 @@
         extend: 'Rally.app.GridBoardApp',
         alias: 'widget.customgridboardapp',
         requires: [
-            'Rally.ui.Button',
+            'Rally.ui.grid.FieldColumnFactory',
             'Rally.ui.gridboard.plugin.GridBoardCustomView'
         ],
-        statePrefix: 'customGridBoard',
+        statePrefix: 'customtree',
         config: {
             enableGridBoardToggle: false,
             defaultSettings: {
@@ -18,11 +18,52 @@
 
         loadModelNames: function () {
             var modelNames = this.getSetting('modelNames');
-            return Deft.Promise.when(_.isString(modelNames) ? Ext.JSON.decode(modelNames) : modelNames);
+            return Deft.Promise.when(_.isString(modelNames) ? modelNames.split(',') : modelNames);
         },
 
         getHeaderControls: function () {
             return this.callParent(arguments).concat(this._createModelPicker());
+        },
+
+        getGridBoardPlugins: function () {
+            return this.callParent(arguments).concat([
+                {
+                    ptype: 'rallygridboardcustomview',
+                    stateId: this.getStateId()
+                }
+            ]);
+        },
+
+        getGridConfig: function () {
+            return _.merge(this.callParent(arguments), {
+                enableRanking: this._areArtifacts(this.modelNames),
+                autoAddAllModelFieldsAsColumns: _.isEmpty(this.getColumnCfgs())
+            });
+        },
+
+        getColumnCfgs: function () {
+            return Rally.ui.grid.FieldColumnFactory.getDefaultFieldsForTypes(this.modelNames);
+        },
+
+        changeTypes: function (newTypes) {
+            var oldTypes = this.modelNames;
+            this.modelNames = _.clone(newTypes);
+            this.gridboard.changeModelTypes(_.clone(newTypes));
+
+            this._setColumnsForNewTypes(oldTypes, newTypes);
+
+            this.updateSettingsValues({
+                settings: {
+                    modelNames: newTypes
+                }
+            });
+
+            this.loadGridBoard();
+        },
+
+        loadGridBoard: function () {
+            this.enableOwnerFilter = this._areArtifacts(this.modelNames);
+            return this.callParent(arguments);
         },
 
         _createModelPicker: function (options) {
@@ -64,26 +105,33 @@
             return this.modelPicker;
         },
 
-        changeTypes: function (newTypes) {
-            var oldTypes = this.modelNames;
-            this.modelNames = _.clone(newTypes);
-            this.gridboard.changeModelTypes(_.clone(newTypes));
-
-            if (!this._areArtifacts(oldTypes) || !this._areArtifacts(newTypes)) {
-                this._setDefaultColumns();
+        _setColumnsForNewTypes: function (oldTypes, newTypes) {
+            if (this.toggleState !== 'grid') {
+                return;
             }
 
-            this.updateSettingsValues({
-                settings: {
-                    modelNames: Ext.JSON.encode(newTypes)
-                }
-            });
+            var grid = this.gridboard.getGridOrBoard();
+            var gridState = grid.getState();
+            var newColumns = Rally.ui.grid.FieldColumnFactory.getDefaultFieldsForTypes(newTypes);
 
-            this.loadGridBoard();
-        },
+            if (this._areArtifacts(oldTypes) && this._areArtifacts(newTypes)) {
+                var existingColumns = gridState.columns;
+                var existingColumnNames = _(existingColumns).map(function (column) {
+                    return _.isString(column) ? column : column.dataIndex }
+                ).compact().value();
+                var defaultColumnsRemoved = _.difference(Rally.ui.grid.FieldColumnFactory.getDefaultFieldsForTypes(oldTypes), existingColumnNames);
+                var newColumnsToAdd = _.difference(newColumns, defaultColumnsRemoved, existingColumnNames);
 
-        _setDefaultColumns: function () {
-            debugger;
+                newColumns = _.filter(existingColumns, function (column) {
+                    return column && !_.contains(defaultColumnsRemoved, column.dataIndex || column);
+                }).concat(_.map(newColumnsToAdd, function (column) {
+                    return { dataIndex: column };
+                }));
+            }
+
+            gridState.columns = newColumns;
+
+            Ext.state.Manager.set(grid.stateId, gridState);
         },
 
         _areArtifacts: function (types) {
@@ -98,15 +146,6 @@
 
             return normalizedCurrentModels.length != normalizedSelectedModels.length ||
                 _.intersection(normalizedCurrentModels, normalizedSelectedModels).length != normalizedCurrentModels.length;
-        },
-
-        getGridBoardPlugins: function () {
-            return this.callParent(arguments).concat([
-                {
-                    ptype: 'rallygridboardcustomview',
-                    stateId: this.getStateId()
-                }
-            ]);
         }
     });
 })();
