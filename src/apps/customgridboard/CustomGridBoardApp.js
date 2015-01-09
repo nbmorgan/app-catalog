@@ -8,8 +8,8 @@
             'Rally.ui.grid.FieldColumnFactory',
             'Rally.ui.gridboard.plugin.GridBoardCustomView'
         ],
-        statePrefix: 'customtree',
         config: {
+            statePrefix: 'customtree',
             enableGridBoardToggle: false,
             defaultSettings: {
                 modelNames: ['hierarchicalrequirement']
