@@ -46,10 +46,12 @@
         },
 
         changeTypes: function (newTypes) {
+            this.gridboard.changeModelTypes(_.clone(newTypes));
+        },
+
+        onModelTypesChange: function (gridboard, newTypes) {
             var oldTypes = this.modelNames;
             this.modelNames = _.clone(newTypes);
-            this.gridboard.changeModelTypes(_.clone(newTypes));
-
             this._setColumnsForNewTypes(oldTypes, newTypes);
 
             this.updateSettingsValues({
@@ -59,6 +61,11 @@
             });
 
             this.loadGridBoard();
+        },
+
+        addGridBoard: function () {
+            this.callParent(arguments);
+            this.gridboard.on('modeltypeschange', this.onModelTypesChange, this);
         },
 
         loadGridBoard: function () {
