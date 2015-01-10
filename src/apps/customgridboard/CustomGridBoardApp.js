@@ -34,6 +34,12 @@
             ]);
         },
 
+        getFilterControlConfig: function () {
+            return _.merge(this.callParent(arguments), {
+                showModelFilter: false
+            });
+        },
+
         getGridConfig: function () {
             return _.merge(this.callParent(arguments), {
                 enableRanking: this._areArtifacts(this.modelNames),
@@ -50,9 +56,7 @@
         },
 
         onModelTypesChange: function (gridboard, newTypes) {
-            var oldTypes = this.modelNames;
-            this.modelNames = _.clone(newTypes);
-            this._setColumnsForNewTypes(oldTypes, newTypes);
+            this._setColumnsForNewTypes(this.modelNames, newTypes);
 
             this.updateSettingsValues({
                 settings: {
@@ -60,12 +64,7 @@
                 }
             });
 
-            this.loadGridBoard();
-        },
-
-        addGridBoard: function () {
             this.callParent(arguments);
-            this.gridboard.on('modeltypeschange', this.onModelTypesChange, this);
         },
 
         loadGridBoard: function () {
