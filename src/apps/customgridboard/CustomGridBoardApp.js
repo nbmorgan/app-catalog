@@ -52,7 +52,7 @@
         },
 
         changeTypes: function (newTypes) {
-            this.gridboard.changeModelTypes(_.clone(newTypes));
+            this.gridboard.changeModelTypes(newTypes);
         },
 
         onModelTypesChange: function (gridboard, newTypes) {
@@ -128,11 +128,15 @@
                 var defaultColumnsRemoved = _.difference(Rally.ui.grid.FieldColumnFactory.getDefaultFieldsForTypes(oldTypes), existingColumnNames);
                 var newColumnsToAdd = _.difference(newColumns, defaultColumnsRemoved, existingColumnNames);
 
-                newColumns = _.filter(existingColumns, function (column) {
-                    return column && !_.contains(defaultColumnsRemoved, column.dataIndex || column);
-                }).concat(_.map(newColumnsToAdd, function (column) {
-                    return { dataIndex: column };
-                }));
+                newColumns = Rally.ui.grid.FieldColumnFactory.filterMultipleStateFields(
+                    _(existingColumns).filter(function (column) {
+                        return column && !_.contains(defaultColumnsRemoved, column.dataIndex || column);
+                    }).concat(newColumnsToAdd).map(function (column) {
+                        if (_.isString(column)) {
+                            return { dataIndex: column };
+                        }
+                        return _.omit(column, ['width', 'flex']);
+                    }).value());
             }
 
             gridState.columns = newColumns;
