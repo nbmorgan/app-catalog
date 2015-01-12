@@ -67,6 +67,11 @@
             this.callParent(arguments);
         },
 
+        addGridBoard: function () {
+            this.callParent(arguments);
+            this.gridboard.on('selectedtypeschange', this.onModelTypesChange, this);
+        },
+
         loadGridBoard: function () {
             this.enableOwnerFilter = this._areArtifacts(this.modelNames);
             return this.callParent(arguments);
@@ -134,7 +139,9 @@
                     if (_.isString(column)) {
                         return { dataIndex: column };
                     }
-                    return _.omit(column, ['width', 'flex']);
+                    return _.assign(_.omit(column, ['width', 'flex']), {
+                        flex: Rally.ui.grid.FieldColumnFactory.getDefaultFlexForField(column.dataIndex)
+                    });
                 }).value();
             }
 
