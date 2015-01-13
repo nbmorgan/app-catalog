@@ -294,7 +294,9 @@
                     requiresModelSpecificFilters: false
                 },
                 cardConfig: {
-                    showAge: this.getSetting('showCardAge') ? this.getSetting('cardAgeThreshold') : -1
+                    showAge: this.getSetting('showCardAge') ? this.getSetting('cardAgeThreshold') : -1,
+                    showRelatedCardsIcon: this.getContext().isFeatureEnabled('ITERATION_STATUS_RELATED_CARDS_MENU')
+
                 },
                 listeners: {
                     filter: this._onBoardFilter,
