@@ -50,13 +50,9 @@ describe 'Rally.apps.portfolioitemstreegrid.PortfolioItemsTreeGridApp', ->
       expect(_.intersection(storeTypes, piTypes)).toEqual piTypes
 
   describe '#getGridConfig', ->
-    it 'should return bufferedRenderer true when feature toggle enabled', ->
-      @renderApp(true).then =>
-        expect(@app.getGridConfig().bufferedRenderer).toBe true
-
-    it 'should return bufferedRenderer false when feature toggle disabled', ->
+    it 'should enable bufferedRenderer by default', ->
       @renderApp(false).then =>
-        expect(@app.getGridConfig().bufferedRenderer).toBe false
+        expect(@app.getGridConfig().bufferedRenderer).toBe true
 
     it 'should enable inline', ->
       @renderApp().then =>

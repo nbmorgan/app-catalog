@@ -18,10 +18,8 @@
 
         getGridConfig: function(options){
             var config = this.callParent(arguments);
-            var isBufferedRendererEnabled = this.getContext().isFeatureEnabled('S78545_ENABLE_BUFFERED_RENDERER_FOR_PI_PAGE');
-            config.bufferedRenderer = isBufferedRendererEnabled;
-            config.expandAllInColumnHeaderEnabled = !Ext.isIE || isBufferedRendererEnabled;
-            config.enableInlineAdd = true;
+            config.bufferedRenderer = true;
+            config.enableInlineAdd = this.getContext().isFeatureEnabled('F6038_ENABLE_INLINE_ADD');
             return config;
         }
     });
