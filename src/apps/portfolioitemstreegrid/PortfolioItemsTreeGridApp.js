@@ -8,7 +8,7 @@
             'Rally.ui.gridboard.plugin.GridBoardActionsMenu',
             'Rally.ui.grid.TreeGridPrintDialog',
             'Rally.ui.dialog.CsvImportDialog',
-            'Rally.ui.grid.GridCsvExport'
+            'Rally.ui.grid.GridExport'
         ],
 
         componentCls: 'pitreegrid',
@@ -64,7 +64,7 @@
                     {
                         text: 'Export...',
                         handler: function() {
-                            window.location = Rally.ui.grid.GridCsvExport.buildCsvExportUrl(this.gridboard.getGridOrBoard());
+                            window.location = Rally.ui.grid.GridExport.buildCsvExportUrl(this.gridboard.getGridOrBoard());
                         },
                         scope: this
                     }
