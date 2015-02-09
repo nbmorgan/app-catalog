@@ -56,7 +56,7 @@
         },
 
         getAddNewConfig: function () {
-            return {
+            return Ext.merge(this.callParent(arguments), {
                 showRank: false,
                 showAddWithDetails: false,
                 openEditorAfterAddFailure: false,
@@ -74,7 +74,7 @@
                         value: Rally.util.Ref.getRelativeUri(this.getContext().getProject())
                     }
                 ]
-            };
+            });
         }
     });
 })();

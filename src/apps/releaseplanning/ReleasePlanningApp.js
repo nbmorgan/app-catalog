@@ -61,7 +61,11 @@
                 plugins: [
                     {
                         ptype: 'rallygridboardaddnew',
-                        rankScope: 'BACKLOG'
+                        rankScope: 'BACKLOG',
+                        addNewControlConfig: {
+                            stateful: true,
+                            stateId: context.getScopedStateId('release-planning-add-new')
+                        }
                     },
                     {
                         ptype: 'rallygridboardcustomfiltercontrol',
