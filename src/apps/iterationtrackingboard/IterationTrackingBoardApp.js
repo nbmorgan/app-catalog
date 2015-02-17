@@ -31,7 +31,6 @@
             'Rally.ui.filter.view.OwnerPillFilter',
             'Rally.ui.filter.view.TagPillFilter',
             'Rally.app.Message',
-            'Rally.apps.iterationtrackingboard.StatsBanner',
             'Rally.apps.iterationtrackingboard.StatsBannerField',
             'Rally.clientmetrics.ClientMetricsRecordable',
             'Rally.apps.common.RowSettingsField'
@@ -53,8 +52,7 @@
                 showCardAge: true,
                 showStatsBanner: true,
                 cardAgeThreshold: 3
-            },
-            includeStatsBanner: true
+            }
         },
 
         modelNames: ['User Story', 'Defect', 'Defect Suite', 'Test Set'],
@@ -80,10 +78,6 @@
                 // reset page count to 1.
                 // must be called here to reset persisted page count value.
                 grid.fireEvent('storecurrentpagereset');
-            }
-
-            if (this._shouldShowStatsBanner()){
-                this._addStatsBanner();
             }
 
             this._buildGridStore().then({
@@ -135,11 +129,13 @@
         getUserSettingsFields: function () {
             var fields = this.callParent(arguments);
 
-            fields.push({
-                xtype: 'rallystatsbannersettingsfield',
-                fieldLabel: '',
-                mapsToMultiplePreferenceKeys: ['showStatsBanner']
-            });
+            if (this.isFullPageApp !== false) {
+                fields.push({
+                    xtype: 'rallystatsbannersettingsfield',
+                    fieldLabel: '',
+                    mapsToMultiplePreferenceKeys: ['showStatsBanner']
+                });
+            }
 
             return fields;
         },
@@ -159,25 +155,6 @@
                 };
 
             return Ext.create('Rally.data.wsapi.TreeStoreBuilder').build(config);
-        },
-
-        _shouldShowStatsBanner: function() {
-            return this.includeStatsBanner && this.getSetting('showStatsBanner');
-        },
-
-        _addStatsBanner: function() {
-           this.remove('statsBanner');
-           this.add({
-                xtype: 'statsbanner',
-                itemId: 'statsBanner',
-                context: this.getContext(),
-                margin: '0 0 5px 0',
-                shouldOptimizeLayouts: this.config.optimizeFrontEndPerformanceIterationStatus,
-                listeners: {
-                    resize: this._resizeGridBoardToFillSpace,
-                    scope: this
-                }
-           });
         },
 
         _addGridBoard: function (gridStore) {
@@ -306,9 +283,6 @@
 
         _getAvailableGridBoardHeight: function() {
             var height = this.getHeight();
-            if (this._shouldShowStatsBanner() && this.down('#statsBanner').rendered) {
-                height -= this.down('#statsBanner').getHeight();
-            }
             if (this.getHeader()) {
                 height -= this.getHeader().getHeight();
             }
