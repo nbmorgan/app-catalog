@@ -9,8 +9,9 @@
 
     Ext.define('Rally.apps.timeboxes.TimeboxesApp', {
         extend: 'Rally.app.GridBoardApp',
-        require: [
+        requires: [
             'Deft.Deferred',
+            'Rally.apps.timeboxes.IterationVelocityA0Chart',
             'Rally.ui.gridboard.GridBoardToggle'
         ],
 
@@ -59,11 +60,7 @@
         getChartConfig: function () {
             if (this._enableCharts()) {
                 return {
-                    xtype: 'component',
-                    style: {
-                        overflow: 'hidden'
-                    },
-                    html: '<iframe style="width: 100%; height: 100%" src="'+ Rally.environment.getServer().getContextPath() +'/charts/iterationVelocityChart.sp"></iframe>'
+                    xtype: 'rallyiterationvelocitya0chart'
                 };
             }
         },

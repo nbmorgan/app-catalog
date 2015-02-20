@@ -4,6 +4,7 @@
    "server": "https://rally1.rallydev.com",
    "sdk": "x",
    "javascript": [
-      "TimeboxesApp.js"
+       "IterationVelocityA0Chart.js",
+       "TimeboxesApp.js"
    ]
 }
