@@ -170,7 +170,7 @@
         _createPITypePicker: function () {
             var deferred = new Deft.Deferred();
 
-            this.piTypePicker = Ext.create('Rally.ui.combobox.PortfolioItemTypeComboBox', {
+            this.piTypePicker = Ext.create('Rally.ui.combobox.PortfolioItemTypeComboBox', _.merge({
                 preferenceName: this.getStateId('typepicker'),
                 fieldLabel: '', // delete this when removing PORTFOLIO_ITEM_TREE_GRID_PAGE_OPT_IN toggle. Can't delete these from PI Combobox right now or GUI tests fail in old PI page
                 labelWidth: 0,  // delete this when removing PORTFOLIO_ITEM_TREE_GRID_PAGE_OPT_IN toggle. Can't delete these from PI Combobox right now or GUI tests fail in old PI page
@@ -187,9 +187,13 @@
                     },
                     scope: this
                 }
-            });
+            }, this.getTypePickerConfig()));
 
             return deferred.promise;
+        },
+        
+        getTypePickerConfig: function () {
+            return {};
         },
 
         _onTypeChange: function (picker) {
