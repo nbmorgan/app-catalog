@@ -12,7 +12,8 @@
         ],
 
         statePrefix: 'customlist',
-        disallowedAddNewTypes: ['user', 'userprofile', 'useriterationcapacity', 'testcaseresult', 'task', 'scmrepository', 'project', 'changeset', 'change', 'builddefinition', 'build'],
+        disallowedAddNewTypes: ['user', 'userprofile', 'useriterationcapacity', 'testcaseresult', 'task', 'scmrepository', 'project', 'changeset', 'change', 'builddefinition', 'build', 'program'],
+        readOnlyGridTypes: ['Build', 'Change', 'Changeset'],
 
         initComponent: function () {
             this.defaultSettings = {
@@ -48,6 +49,7 @@
 
         getGridConfig: function () {
             return _.merge(this.callParent(arguments), {
+                enableEditing: !_.contains(this.readOnlyGridTypes, this.getSetting('type')),
                 listeners: {
                     beforestaterestore: this._onBeforeGridStateRestore,
                     beforestatesave: this._onBeforeGridStateSave,
