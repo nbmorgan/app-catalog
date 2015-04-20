@@ -73,7 +73,7 @@ module.exports = (grunt) ->
   specFiles = 'test/spec/**/*Spec.coffee'
   cssFiles = 'src/apps/**/*.{css,less}'
 
-  seleniumMajorVersion = '2.44'
+  seleniumMajorVersion = '2.45'
   seleniumMinorVersion = '0'
   grunt.option('selenium-jar-path',"lib/selenium-server-standalone-#{seleniumMajorVersion}.#{seleniumMinorVersion}.jar")
 
