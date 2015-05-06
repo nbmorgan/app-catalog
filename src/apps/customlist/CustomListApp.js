@@ -9,7 +9,8 @@
             'Rally.data.ModelTypes',
             'Rally.data.util.Sorter',
             'Rally.data.wsapi.Filter',
-            'Rally.ui.notify.Notifier'
+            'Rally.ui.notify.Notifier',
+            'Rally.util.Filter'
         ],
 
         disallowedAddNewTypes: ['user', 'userprofile', 'useriterationcapacity', 'testcaseresult', 'task', 'scmrepository', 'project', 'changeset', 'change', 'builddefinition', 'build', 'program'],

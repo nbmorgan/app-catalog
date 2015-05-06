@@ -199,9 +199,14 @@ describe 'Rally.apps.customlist.CustomListApp', ->
       @createAppWithQuery('(Name contains "{projectName}")').then =>
         expect(@artifactRequest.lastCall.args[0].params.query).toBe "(Name CONTAINS \"#{Rally.environment.getContext().getProject().Name}\")"
 
+    it 'should allow queries for atributes based on stupid legacy name which can be different from the name used everywhere else', ->
+      @createApp(settings: {type: 'defect', query: '(SmallMacKanban = "Backlog")'}).then =>
+        expect(@artifactRequest.lastCall.args[0].params.query).toBe '(SmallMacKanban = "Backlog")'
+
     describe 'contains invalid field names', ->
       beforeEach ->
-        @createAppWithQuery '(((Turd.Name = "Poopy McPoop") OR (Project.ObjectID = 123)) AND ((PoopBoolean = false) OR (TargetDate = 01/01/01)) OR (Name contains "poop"))'
+        @createAppWithQuery '(((Turd.Name = "Poopy McPoop") OR (Project.ObjectID = 123)) AND ((PoopBoolean = false) OR (TargetDate = 01/01/01)) OR (KanbanState = "In-Deep-Poop"))'
+
       it 'should not make a request to WSAPI', ->
         expect(@artifactRequest.callCount).toBe 0
 
