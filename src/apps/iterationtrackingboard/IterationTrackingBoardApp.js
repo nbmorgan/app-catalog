@@ -478,12 +478,34 @@
                 sharedViewConfig: {
                     stateful: true,
                     stateId: this.getContext().getScopedStateId('iteration-tracking-shared-view'),
-                    defaultViews: [
-                        //TODO: S88456: implement the views
-                        //{ Name: 'foo', Value: '{ foo:\'bar\'}', identifier: 'foo'},
-                   ]
+                    defaultViews: _.map(this._getDefaultViews(), function(view){
+                        Ext.apply(view, {
+                            identifier: view.Name,
+                            Value: Ext.JSON.encode(view.Value, true)
+                        });
+                        return view;
+                    }, this)
                 }
             };
+        },
+
+        _getDefaultViews: function(){
+            return [
+                {   Name: 'foo(Grid)',
+                    Value: {
+                        cmp: {
+                            toggleState: 'grid'
+                        }
+                    }
+                },
+                {   Name: 'foo(Board)',
+                    Value: {
+                        cmp: {
+                            toggleState: 'board'
+                        }
+                    }
+                }
+            ]
         },
 
         _getCustomViewConfig: function() {
