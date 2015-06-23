@@ -247,6 +247,10 @@ module.exports = (grunt) ->
             "#{appsdk_path}/test/support/sinon/rally-sinon-config.js"
             "node_modules/immutable/dist/immutable.js"
 
+            "#{appsdk_path}/node_modules/moment/min/moment.min.js"
+            "#{appsdk_path}/node_modules/moment-timezone/moment-timezone.js"
+            "#{appsdk_path}/lib/moment-timezone-data/moment-timezone-data.js"
+
             # Setup
             'lib/webdriver/webdriver.js'
             "#{appsdk_path}/test/support/webdriver/error.js"
