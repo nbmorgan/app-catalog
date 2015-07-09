@@ -16,6 +16,9 @@
             'Rally.data.wsapi.TreeStoreBuilder',
             'Rally.ui.dialog.CsvImportDialog',
             'Rally.ui.gridboard.GridBoard',
+            'Rally.ui.gridboard.plugin.BoardPolicyDisplayable',
+            'Rally.ui.cardboard.plugin.ColumnPolicy',
+            'Rally.ui.gridboard.plugin.ColumnConfigurator',
             'Rally.ui.cardboard.plugin.FixedHeader',
             'Rally.ui.cardboard.plugin.Print',
             'Rally.ui.gridboard.plugin.GridBoardActionsMenu',
@@ -278,6 +281,17 @@
                 }
             };
 
+            if (this.getContext().isFeatureEnabled('BOARD_CONSISTENCY')) {
+                config.columnConfig.enableWipLimit = true;
+                //config.plugins.push({
+                //    ptype: 'rallyboardpolicydisplayable',
+                //    prefKey: 'kanbanAgreementsChecked',
+                //    checkboxConfig: {
+                //        boxLabel: 'Show Agreements'
+                //    }
+                //});
+            }
+
             if (this.getSetting('showRows') && this.getSetting('rowsField')) {
                 Ext.merge(config, {
                     rowConfig: {
@@ -411,6 +425,20 @@
                 boardFieldDefaults: (this.getSetting('cardFields') && this.getSetting('cardFields').split(',')) ||
                     ['Parent', 'Tasks', 'Defects', 'Discussion', 'PlanEstimate', 'Iteration']
             });
+
+            if (context.isFeatureEnabled('BOARD_CONSISTENCY')) {
+                plugins.push({
+                    ptype: 'rallycolumnconfigurator',
+                    fieldBlackList: [
+                        'Successors',
+                        'Predecessors'
+                    ],
+                    modelNames: this.modelNames,
+                    fieldDefaults: (this.getSetting('cardFields') && this.getSetting('cardFields').split(',')) ||
+                        ['Parent', 'Tasks', 'Defects', 'Discussion', 'PlanEstimate', 'Iteration'],
+                    headerPosition: 'left'
+                });
+            }
 
             if (context.isFeatureEnabled('ITERATION_TRACKING_CUSTOM_VIEWS')) {
                 plugins.push(this._getCustomViewConfig());

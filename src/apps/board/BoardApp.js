@@ -8,6 +8,8 @@
         requires: [
             'Rally.ui.cardboard.plugin.FixedHeader',
             'Rally.ui.gridboard.GridBoard',
+            'Rally.ui.gridboard.plugin.BoardPolicyDisplayable',
+            'Rally.ui.cardboard.plugin.ColumnPolicy',
             'Rally.ui.gridboard.plugin.GridBoardAddNew',
             'Rally.ui.gridboard.plugin.GridBoardCustomFilterControl',
             'Rally.ui.gridboard.plugin.GridBoardFieldPicker',
@@ -94,7 +96,18 @@
                         scope: this
                     }
                 };
-            if(this.getEl()) {
+
+            if (this.getContext().isFeatureEnabled('BOARD_CONSISTENCY')) {
+                config.plugins.push({
+                    ptype: 'rallyboardpolicydisplayable',
+                    prefKey: 'kanbanAgreementsChecked',
+                    checkboxConfig: {
+                        boxLabel: 'Show Agreements'
+                    }
+                });
+            }
+
+            if (this.getEl()) {
                 config.height = this.getHeight();
             }
             return config;
@@ -132,6 +145,16 @@
                         sortDirection: 'ASC'
                     }
                 });
+            }
+            if (this.getContext().isFeatureEnabled('BOARD_CONSISTENCY')) {
+                boardConfig.columnConfig = {
+                    plugins: [
+                        {
+                            ptype: 'rallycolumnpolicy',
+                            app: this
+                        }
+                    ]
+                };
             }
             return boardConfig;
         },
