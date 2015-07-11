@@ -219,12 +219,20 @@
         },
 
         _onBeforeFilterButtonStateRestore:  function (filterButton, state) {
-            if (state && state.filters && state.filters.length) {
+            if (!state) {
+                return;
+            }
+
+            if (!_.isEmpty(state.filters)) {
                 var stateFilters = _.map(state.filters, function (filterStr) {
                     return Rally.data.wsapi.Filter.fromQueryString(filterStr);
                 });
                 var validFilters = Rally.util.Filter.removeNonapplicableTypeSpecificFilters(stateFilters, this.models);
                 state.filters = _.invoke(validFilters, 'toString');
+            } else if (state.types && state.types.length !== this.modelNames.length) {
+                state.types = _.map(this.modelNames, function (modelName) {
+                    return modelName.toLowerCase();
+                });
             }
         },
 
