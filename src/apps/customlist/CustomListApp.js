@@ -36,7 +36,8 @@
         },
 
         loadModelNames: function () {
-            this.modelNames = _.compact([this.getSetting('type')]);
+            var typeSetting = (Rally.environment.getContext().isFeatureEnabled('MULTI_TYPE_CUSTOM_LIST') && this.getSetting('types')) || this.getSetting('type');
+            this.modelNames = typeSetting ? typeSetting.split(',') : [];
             this._setColumnNames(this.getSetting('columnNames'));
             return Deft.Promise.when(this.modelNames);
         },
@@ -65,7 +66,7 @@
         getGridConfig: function () {
             var config = _.merge(this.callParent(arguments), {
                 allColumnsStateful: true,
-                enableEditing: !_.contains(this.readOnlyGridTypes, this.getSetting('type').toLowerCase()),
+                enableEditing: !this._containsAnyTypes(this.readOnlyGridTypes),
                 listeners: {
                     beforestaterestore: this._onBeforeGridStateRestore,
                     beforestatesave: this._onBeforeGridStateSave,
@@ -197,12 +198,20 @@
             return hasTimeboxField ? [ timeboxScope.getQueryFilter() ] : [];
         },
 
-        _shouldEnableAddNew: function() {
-            return !_.contains(this.disallowedAddNewTypes, this.getSetting('type').toLowerCase());
+        _shouldEnableAddNew: function () {
+            return !this._containsAnyTypes(this.disallowedAddNewTypes);
         },
 
-        _shouldEnableRanking: function(){
-            return this.getSetting('type').toLowerCase() !== 'task';
+        _shouldEnableRanking: function (){
+            return !this._containsAnyTypes(['Task']);
+        },
+
+        _containsAnyTypes: function (types) {
+            return _.any(this.modelNames, function (configuredType) {
+                return _.any(types, function (type) {
+                    return configuredType.toLowerCase() === type.toLowerCase();
+                });
+            });
         },
 
         _setColumnNames: function (columnNames) {

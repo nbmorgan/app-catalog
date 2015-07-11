@@ -1,0 +1,11 @@
+.customListTypePickerRadio {
+    float: left;
+    width: 100px;
+}
+
+.customListTypePicker .rui-multi-object-picker-no-trigger::-webkit-input-placeholder,
+.customListTypePicker .rui-multi-object-picker-no-trigger:-moz-placeholder,
+.customListTypePicker .rui-multi-object-picker-no-trigger::-moz-placeholder,
+.customListTypePicker .rui-multi-object-picker-no-trigger:-ms-input-placeholder {
+    color: black;
+}
