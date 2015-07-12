@@ -170,8 +170,9 @@
                 itemId: config.id + 'Picker',
                 listeners: {
                     select: function (combo, selectedTypes) {
-                        this.setValue(this._getTypePathsFromTypeDefs(selectedTypes));
-                        this.fireEvent('typeschanged', this, selectedTypes);
+                        var typePaths = this._getTypePathsFromTypeDefs(selectedTypes);
+                        this.setValue(typePaths);
+                        this.fireEvent('typeschanged', this, typePaths);
                     },
                     scope: this
                 },

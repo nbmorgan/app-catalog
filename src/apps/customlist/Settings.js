@@ -5,10 +5,21 @@
         return {
             name: name,
             xtype: 'rallytextfield',
+            getSubmitData: function () {
+                var data = {};
+                data[name] = this._shouldInvalidate ? null : this.getValue();
+                return data;
+            },
             hidden: true,
             handlesEvents: {
-                typeschanged: function (types) {
-                    this.setValue(null);
+                typeschanged: function (picker, selectedTypePaths) {
+                    var originalTypePaths = picker.originalValue || ['HierarchicalRequirement'];
+                    if (!_.isArray(originalTypePaths)) {
+                        originalTypePaths = [originalTypePaths];
+                    }
+
+                    var unchangedTypePaths = _.intersection(originalTypePaths, selectedTypePaths);
+                    this._shouldInvalidate = unchangedTypePaths.length !== originalTypePaths.length;
                 }
             }
         };
@@ -73,7 +84,7 @@
                 valueField: 'TypePath',
                 listeners: {
                     select: function (combo) {
-                        combo.fireEvent('typeschanged', [combo.getRecord().get('TypePath')]);
+                        combo.fireEvent('typeschanged', combo, [combo.getRecord().get('TypePath')]);
                     }
                 },
                 bubbleEvents: ['typeschanged'],
