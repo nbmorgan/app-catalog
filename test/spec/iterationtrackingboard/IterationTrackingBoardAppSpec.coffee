@@ -267,7 +267,15 @@ describe 'Rally.apps.iterationtrackingboard.IterationTrackingBoardApp', ->
           ))
 
       describe 'stories', ->
-        it 'should exclude epic stories from the grid', ->
+        it 'should exclude epic stories from the grid with unscheduled timebox', ->
+          requestStub = @stubRequests()
+          iterationRecord = @mom.getRecord('iteration', values: {Name:'Unscheduled'})
+          @createApp(iterationRecord: iterationRecord).then =>
+            @toggleToGrid()
+            expect(requestStub).toBeWsapiRequestWith
+              filters: [@createLeafStoriesOnlyFilter()]
+
+        it 'should exclude epic stories from the grid with null timebox', ->
           requestStub = @stubRequests()
           @createApp(iterationRecord: null).then =>
             @toggleToGrid()

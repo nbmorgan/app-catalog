@@ -192,11 +192,10 @@
         },
 
         _getGridboardFilters: function(model) {
-            var timeboxScope = this.getContext().getTimeboxScope(),
-                timeboxFilter = timeboxScope.getQueryFilter(),
+            var timeboxFilter = this.getContext().getTimeboxScope().getQueryFilter(),
                 filters = [timeboxFilter];
 
-            if (!timeboxScope.getRecord() && this.getContext().getSubscription().StoryHierarchyEnabled) {
+            if (this.isUnscheduledTimebox() && this.getContext().getSubscription().StoryHierarchyEnabled) {
                 filters.push(this._createLeafStoriesOnlyFilter(model));
                 filters.push(this._createUnassociatedDefectsOnlyFilter(model));
             }
