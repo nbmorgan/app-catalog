@@ -6,7 +6,8 @@
 
         requires: [
             'Rally.ui.cardboard.plugin.CollapsibleColumns',
-            'Rally.ui.cardboard.plugin.FixedHeader'
+            'Rally.ui.cardboard.plugin.FixedHeader',
+            'Rally.ui.gridboard.plugin.GridBoardInlineFilterControl'
         ],
 
         constructor: function(config){
@@ -57,11 +58,45 @@
             });
         },
 
-        getFilterControlConfig: function () {
+        getGridBoardCustomFilterControlConfig: function () {
+            var context = this.getContext();
+            if(context.isFeatureEnabled('S98593_ENABLE_ADVANCED_FILTERING_ON_PORTFOLIO_ITEMS')) {
+                return {
+                    ptype: 'rallygridboardinlinefiltercontrol',
+                    inline: this.isFullPageApp !== false,
+                    inlineFilterButtonConfig: {
+                        stateful: true,
+                        stateId: context.getScopedStateId('iteration-tracking-inline-filter'),
+                        filterChildren: true,
+                        modelNames: this.modelNames,
+                        inlineFilterPanelConfig: {
+                            quickFilterPanelConfig: {
+                                fields: [
+                                    'ArtifactSearch',
+                                    'Owner'
+                                ]
+                            },
+                            advancedFilterPanelConfig: {
+                                advancedFilterRowsConfig: {
+                                    propertyFieldConfig: {
+                                        blackListFields: ['PortfolioItemType'],
+                                        whiteListFields: ['Milestones']
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+
             return {
                 blackListFields: ['PortfolioItemType'],
                 whiteListFields: ['Milestones']
             };
+        },
+
+        getFilterControlConfig: function () {
+            return {};
         },
 
         getFieldPickerConfig: function () {
