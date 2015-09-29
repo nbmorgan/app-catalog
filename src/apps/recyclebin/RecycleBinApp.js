@@ -15,8 +15,17 @@
         getGridConfig: function () {
             return _.merge(this.callParent(arguments), {
                 enableRanking: false,
-                enableBulkEdit: false,
-                noDataItemName: 'deleted item'
+                enableBulkEdit: this.getContext().isFeatureEnabled('BULK_DELETE'),
+                noDataItemName: 'deleted item',
+                bulkEditConfig: {
+                    showEdit: false,
+                    showTag: false,
+                    showRemove: false,
+                    showParent: false,
+                    showMilestones: false,
+                    showDelete: true,
+                    permanentlyDelete: true
+                }
             });
         },
 
