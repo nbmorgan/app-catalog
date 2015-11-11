@@ -16,3 +16,4 @@ appcatalog.version
 *.sublime-workspace
 temp/
 tmp/
+LICENSES

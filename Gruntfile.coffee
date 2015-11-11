@@ -23,6 +23,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-curl'
   grunt.loadNpmTasks 'grunt-bump'
   grunt.loadNpmTasks 'grunt-npm'
+  grunt.loadNpmTasks 'grunt-license'
 
   grunt.loadTasks 'grunt/tasks'
 
@@ -105,6 +106,10 @@ module.exports = (grunt) ->
       options:
         # the CI will be producing version files and what-not. they can be safely ignored.
         abortIfDirty: false
+
+    license:
+      options: []
+      your_target: []
 
     clean:
       build: ['build/', 'src/apps/**/*.html', 'temp/']
