@@ -5,9 +5,22 @@
         extend: 'Rally.app.GridBoardApp',
         alias: 'widget.backlogapp',
         columnNames: ['FormattedID', 'Name', 'PlanEstimate', 'Priority', 'Owner'],
-        requires: ['Rally.data.wsapi.Filter'],
+        requires: [
+            'Rally.data.wsapi.Filter',
+            'Rally.ui.gridboard.plugin.GridBoardInlineFilterControl',
+            'Rally.ui.gridboard.plugin.GridBoardSharedViewControl'
+        ],
         modelNames: ['hierarchicalrequirement', 'defect', 'defectsuite'],
         statePrefix: 'backlog',
+
+        getAddNewConfig: function () {
+            var config = {};
+            if (this.getContext().isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
+                config.margin = 0;
+            }
+
+            return _.merge(this.callParent(arguments), config);
+        },
 
         getPermanentFilters: function (types) {
             types = (types === undefined ? ['hierarchicalrequirement', 'defect', 'defectSuite'] : types);
@@ -54,14 +67,53 @@
             };
         },
 
-        getGridBoardCustomFilterControlConfig: function() {
+        getGridBoardCustomFilterControlConfig: function () {
+            var context = this.getContext();
+            var blackListFields = ['ObjectUUID', 'Iteration', 'PortfolioItem', 'Release', 'Subscription'];
+            var whiteListFields = ['Milestones', 'Tags'];
+
+            if (context.isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
+                return {
+                    ptype: 'rallygridboardinlinefiltercontrol',
+                    inline: true,
+                    skinny: true,
+                    inlineFilterButtonConfig: {
+                        stateful: true,
+                        stateId: context.getScopedStateId('backlog-inline-filter'),
+                        filterChildren: true,
+                        modelNames: this.modelNames,
+                        inlineFilterPanelConfig: {
+                            quickFilterPanelConfig: {
+                                defaultFields: [
+                                    'ArtifactSearch',
+                                    'Owner',
+                                    'ModelType'
+                                ],
+                                addQuickFilterConfig: {
+                                    blackListFields: blackListFields,
+                                    whiteListFields: whiteListFields
+                                }
+                            },
+                            advancedFilterPanelConfig: {
+                                advancedFilterRowsConfig: {
+                                    propertyFieldConfig: {
+                                        blackListFields: blackListFields,
+                                        whiteListFields: whiteListFields
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+
             return {
                 showOwnerFilter: false,
                 showIdFilter: true,
-                idFilterConfig:{
+                idFilterConfig: {
                     stateful: true,
                     stateId: this.getScopedStateId('backlog-id-filter'),
-                    storeConfig:{
+                    storeConfig: {
                         autoLoad: true,
                         pageSize: 25,
                         fetch: ['FormattedID', '_refObjectName'],
@@ -69,6 +121,35 @@
                     }
                 }
             };
+        },
+
+        getSharedViewConfig: function() {
+            var context = this.getContext();
+            if (context.isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
+                return {
+                    ptype: 'rallygridboardsharedviewcontrol',
+                    sharedViewConfig: {
+                        stateful: true,
+                        stateId: context.getScopedStateId('backlog-shared-view'),
+                        enableUrlSharing: this.isFullPageApp !== false
+                    },
+                    enableGridEditing: context.isFeatureEnabled('S91174_ISP_SHARED_VIEWS_MAKE_PREFERENCE_NAMES_UPDATABLE')
+                };
+            }
+
+            return {};
+        },
+
+        getGridBoardConfig: function () {
+            var config = this.callParent(arguments);
+            return _.merge(config, {
+                listeners: {
+                    viewchange: function() {
+                        this.loadGridBoard();
+                    },
+                    scope: this
+                }
+            });
         },
 
         _getModelFor: function(type) {
