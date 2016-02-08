@@ -115,9 +115,13 @@
         getGridBoardCustomFilterControlConfig: function() {
             var context = this.getContext();
             if (context.isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
-                var isArtifactModel = Rally.data.ModelTypes.isArtifact(this.models[0].typePath);
+                var isArtifactModel = this.models[0].isArtifact();
                 var blackListFields = isArtifactModel ? ['ModelType', 'PortfolioItemType'] : ['ArtifactSearch', 'ModelType'];
                 var whiteListFields = isArtifactModel ? ['Milestones', 'Tags'] : [];
+
+                if (this.models[0].isProject()) {
+                    blackListFields.push('SchemaVersion');
+                }
 
                 var config = {
                     ptype: 'rallygridboardinlinefiltercontrol',
@@ -145,7 +149,7 @@
                     }
                 };
 
-                if (this.models[0].isArtifact()) {
+                if (isArtifactModel) {
                     config.inlineFilterButtonConfig.modelNames = this.modelNames;
                 } else {
                     config.inlineFilterButtonConfig.model = this.models[0];

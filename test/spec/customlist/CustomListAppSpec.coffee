@@ -337,6 +337,12 @@ describe 'Rally.apps.customlist.CustomListApp', ->
         expect(plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.addQuickFilterConfig.blackListFields).toEqual ['ArtifactSearch', 'ModelType']
         expect(plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.addQuickFilterConfig.whiteListFields).toEqual []
 
+    it 'should use appropriate project blacklist config', ->
+      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
+      @createApp(settings: { type: 'project' }).then =>
+        plugin = @getPlugin()
+        expect(plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.addQuickFilterConfig.blackListFields).toEqual ['ArtifactSearch', 'ModelType', 'SchemaVersion']
+
   describe 'shared view plugin', ->
     helpers
       getPlugin: (filterptype='rallygridboardsharedviewcontrol') ->
