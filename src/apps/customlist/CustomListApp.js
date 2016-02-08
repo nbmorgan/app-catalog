@@ -254,8 +254,10 @@
         clearFiltersAndSharedViews: function() {
             var context = this.getContext();
             if (context.isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
-                this.down('rallyinlinefilterpanel').clear();
-                this.down('rallysharedviewcombobox').reset();
+                if (this.gridboard) {
+                    this.gridboard.down('rallyinlinefilterpanel').clear();
+                    this.gridboard.down('rallysharedviewcombobox').reset();
+                }
 
                 Ext.create('Rally.data.wsapi.Store', {
                     model: Ext.identityFn('preference'),
