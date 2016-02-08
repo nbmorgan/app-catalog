@@ -325,7 +325,7 @@ describe 'Rally.apps.customlist.CustomListApp', ->
         plugin = @getPlugin()
         expect(plugin.inlineFilterButtonConfig.modelNames).toBeDefined()
         expect(plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.defaultFields).toEqual ['ArtifactSearch']
-        expect(plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.addQuickFilterConfig.blackListFields).toEqual ['ModelType']
+        expect(plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.addQuickFilterConfig.blackListFields).toEqual ['ModelType', 'PortfolioItemType']
         expect(plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.addQuickFilterConfig.whiteListFields).toEqual ['Milestones', 'Tags']
 
     it 'should use appropriate nonartifact config', ->

@@ -116,7 +116,7 @@
             var context = this.getContext();
             if (context.isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
                 var isArtifactModel = Rally.data.ModelTypes.isArtifact(this.models[0].typePath);
-                var blackListFields = isArtifactModel ? ['ModelType'] : ['ArtifactSearch', 'ModelType'];
+                var blackListFields = isArtifactModel ? ['ModelType', 'PortfolioItemType'] : ['ArtifactSearch', 'ModelType'];
                 var whiteListFields = isArtifactModel ? ['Milestones', 'Tags'] : [];
 
                 var config = {
