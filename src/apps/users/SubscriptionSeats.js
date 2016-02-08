@@ -33,12 +33,23 @@
         _successHandler: function(response) {
             var responseJson = Ext.JSON.decode(response.responseText);
             var seatsAvailable = responseJson.NumberOfPaidSeats + responseJson.NumberOfUnpaidSeats;
+            var el = this.getEl();
 
-            this.getEl().update(
-                responseJson.HasUnlimitedSeats ?
-                responseJson.NumberOfActiveUsers + ' active user licenses' :
-                (seatsAvailable - responseJson.NumberOfActiveUsers) + ' of ' + seatsAvailable + ' active user licenses remaining'
-            );
+            if (el) {
+                el.update(
+                    responseJson.HasUnlimitedSeats ?
+                    responseJson.NumberOfActiveUsers + ' active user licenses' :
+                    (seatsAvailable - responseJson.NumberOfActiveUsers) + ' of ' + seatsAvailable + ' active user licenses remaining'
+                );
+            }
+        },
+
+        onDestroy: function() {
+            this.unsubscribe(this, Rally.Message.objectUpdate, this._updateSeatInformation, this);
+            this.unsubscribe(this, Rally.Message.recordUpdateSuccess, this._updateSeatInformation, this);
+            this.unsubscribe(this, Rally.Message.objectCreate, this._updateSeatInformation, this);
+            this.unsubscribe(this, Rally.Message.objectDestroy, this._updateSeatInformation, this);
+            this.callParent(arguments);
         }
     });
 })();
