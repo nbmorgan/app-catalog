@@ -185,6 +185,10 @@
                     viewchange: function() {
                         this.loadGridBoard();
                     },
+                    filterchange: function() {
+                        this.gridboard.getGridOrBoard().noDataPrimaryText = undefined;
+                        this.gridboard.getGridOrBoard().noDataSecondaryText = undefined;
+                    },
                     scope: this
                 }
             });

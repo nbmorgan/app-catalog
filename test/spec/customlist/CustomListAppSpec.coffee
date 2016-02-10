@@ -343,6 +343,19 @@ describe 'Rally.apps.customlist.CustomListApp', ->
         plugin = @getPlugin()
         expect(plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.addQuickFilterConfig.blackListFields).toEqual ['ArtifactSearch', 'ModelType', 'SchemaVersion']
 
+    it 'should clear primary and secondary no data messages when filterchange is fired', ->
+      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
+      @createApp(
+        settings:
+          type: 'project'
+          query: "(foo = 'foo')"
+      ).then =>
+        expect(@getGrid().noDataPrimaryText).toBeDefined()
+        expect(@getGrid().noDataSecondaryText).toBeDefined()
+        @app.gridboard.fireEvent('filterchange', @app.gridboard)
+        expect(@getGrid().noDataPrimaryText).not.toBeDefined()
+        expect(@getGrid().noDataSecondaryText).not.toBeDefined()
+
   describe 'shared view plugin', ->
     helpers
       getPlugin: (filterptype='rallygridboardsharedviewcontrol') ->
