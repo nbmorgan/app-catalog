@@ -35,6 +35,7 @@
     "grunt-express": "~1.0.1",
     "grunt-nexus-artifact": "0.3.7",
     "grunt-npm": "0.0.2",
+    "grunt-npm-install": "0.2.0",
     "grunt-parallel-spec-runner": "~0.3.7",
     "grunt-regex-check": "0.1.5",
     "grunt-rick": "0.0.3",

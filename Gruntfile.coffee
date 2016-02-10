@@ -23,13 +23,14 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-curl'
   grunt.loadNpmTasks 'grunt-bump'
   grunt.loadNpmTasks 'grunt-npm'
+  grunt.loadNpmTasks 'grunt-npm-install'
 
   grunt.loadTasks 'grunt/tasks'
 
   grunt.registerTask 'default', ['build']
   grunt.registerTask 'sanity', ['check', 'jshint']
   grunt.registerTask 'css', ['less', 'copy:images', 'replace:imagepaths']
-  grunt.registerTask 'build', 'Builds the catalog', ['clean:build', 'nexus:deps', 'npm:install', 'coffee', 'sanity', 'css', 'sencha:buildapps', 'assemble', 'copy:apphtml']
+  grunt.registerTask 'build', 'Builds the catalog', ['clean:build', 'nexus:deps', 'npm-install', 'coffee', 'sanity', 'css', 'sencha:buildapps', 'assemble', 'copy:apphtml']
 
   grunt.registerTask 'nexus:__createartifact__', 'Internal task to create and publish the nexus artifact', ['version', 'nexus:push:publish', 'clean:target']
   grunt.registerTask 'nexus:deploy', 'Deploys to nexus', ['build', 'nexus:__createartifact__']
