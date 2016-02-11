@@ -86,6 +86,8 @@ module.exports = (grunt) ->
   seleniumVersionUrl = "#{seleniumUrl}/selenium"
   grunt.option('selenium-jar-path',"lib/selenium-server-standalone-#{seleniumMajorVersion}.#{seleniumMinorVersion}.jar")
 
+  senchaCmd = "#{if process.platform is 'darwin' then 'mac' else 'linux'}/sencha"
+
   specFileArray = [
     "test/gen/**/#{spec}Spec.js"
   ]
