@@ -30,7 +30,7 @@ module.exports = (grunt) ->
   grunt.registerTask 'default', ['build']
   grunt.registerTask 'sanity', ['check', 'jshint']
   grunt.registerTask 'css', ['less', 'copy:images', 'replace:imagepaths']
-  grunt.registerTask 'build', 'Builds the catalog', ['clean:build', 'nexus:deps', 'npm-install', 'coffee', 'sanity', 'css', 'sencha:buildapps', 'assemble', 'copy:apphtml']
+  grunt.registerTask 'build', 'Builds the catalog', ['clean:build', 'nexus:deps', 'npm-install', 'coffee', 'sanity', 'css', 'shell:buildapps', 'assemble', 'copy:apphtml']
 
   grunt.registerTask 'nexus:__createartifact__', 'Internal task to create and publish the nexus artifact', ['version', 'nexus:push:publish', 'clean:target']
   grunt.registerTask 'nexus:deploy', 'Deploys to nexus', ['build', 'nexus:__createartifact__']
@@ -379,34 +379,37 @@ module.exports = (grunt) ->
             { id: 'com.rallydev.js:app-catalog:tgz', version: '<%= buildVersion %>', path: 'tmp/' }
           ]
 
-    sencha:
+    shell:
       options:
-        cmd: "./bin/sencha/#{if process.platform is 'darwin' then 'mac' else 'linux'}/sencha"
-      buildapps:
-        options:
-          args: [
-            if debug then '-d' else ''
-            "-s #{ext_path}"
-            'compile'
-            "-classpath=#{appsdk_path}/builds/sdk-dependencies-debug.js,#{appsdk_path}/src,src/apps"
-            'exclude -all and'
-            'include -file src/apps and'
-            'concat build/catalog-all-debug.js and'
-            'concat -compress build/catalog-all.js'
-          ]
-      appmanifest:
-        options:
-          args:[
-            "-s #{ext_path}"
-            'compile'
-            "-classpath=#{appsdk_path}/builds/sdk-dependencies-debug.js,#{appsdk_path}/src,src/apps"
-            'exclude -all and'
-            "union -r -file #{grunt.option('app')}/ and"
-            "exclude -file #{appsdk_path}/builds/sdk-dependencies-debug.js and"
-            "exclude -file #{appsdk_path}/src and"
-            'exclude -namespace Ext and'
-            "metadata -f -t {0} -o temp/#{grunt.option('app')}/appManifest -json -b #{grunt.option('app')}"
-          ]
+        stdout: true
+        stderr: true
+        failOnError: true
+
+      'buildapps':
+        command: [
+          "bin/sencha-cmd/#{senchaCmd}"
+          if debug then '-d' else ''
+          "-s #{ext_path}"
+          'compile'
+          "-classpath=#{appsdk_path}/builds/sdk-dependencies-debug.js,#{appsdk_path}/src,src/apps"
+          'exclude -all and'
+          'include -file src/apps and'
+          'concat build/catalog-all-debug.js and'
+          'concat -compress build/catalog-all.js'
+        ].join(" ")
+      'appmanifest':
+        command:[
+          "bin/sencha-cmd/#{senchaCmd}"
+          "-s #{ext_path}"
+          'compile'
+          "-classpath=#{appsdk_path}/builds/sdk-dependencies-debug.js,#{appsdk_path}/src,src/apps"
+          'exclude -all and'
+          "union -r -file #{grunt.option('app')}/ and"
+          "exclude -file #{appsdk_path}/builds/sdk-dependencies-debug.js and"
+          "exclude -file #{appsdk_path}/src and"
+          'exclude -namespace Ext and'
+          "metadata -f -t {0} -o temp/#{grunt.option('app')}/appManifest -json -b #{grunt.option('app')}"
+        ].join(" ")
 
     assemble:
       options:
@@ -443,4 +446,3 @@ module.exports = (grunt) ->
   grunt.event.on 'watch', (action, filepath) ->
     changedFiles[filepath] = action
     onChange()
-
