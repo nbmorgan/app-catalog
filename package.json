@@ -45,7 +45,8 @@
     "grunt-webdriver-jasmine-runner": "~0.3.3",
     "rally-app-builder": "~0.7.5",
     "rally-sencha-cmd": "4.0.1",
-    "rally-webdriver": "2.44.0"
+    "rally-webdriver": "2.44.0",
+    "rally-appsdk": "2.0.355"
   },
   "publishConfig": {
     "registry": "http://npm-publish.f4tech.com"
