@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "immutable": "^3.6.2",
-    "rally-appsdk": "2.1.37",
+    "rally-appsdk": "2.1.38",
     "rally-ext-lean": "4.2.2"
   }
 }
