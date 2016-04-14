@@ -33,7 +33,7 @@
 
         showAssociatedTasks: function() {
             this._showAssociatedArtifactsPopover({
-                columns: ['FormattedID', 'Name', 'State', 'Owner', 'Iteration', 'Project', 'LastUpdateDate'],
+                columns: ['FormattedID', 'Name', 'WorkProduct', 'State', 'Owner', 'Iteration', 'Project', 'LastUpdateDate'],
                 target: this.card.getEl().down('.AssociatedTasks'),
                 title: 'Tasks',
                 type: 'Task'
