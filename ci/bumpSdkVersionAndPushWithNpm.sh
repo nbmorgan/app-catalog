@@ -1,5 +1,9 @@
 #!/bin/bash -el
 
+if [ -d "/home/jenkins/.nvm" ]; then
+    source  ~/.nvm/nvm.sh
+fi
+
 sed -i "s/appsdk-src:tgz:[^\"]*\",/appsdk-src:tgz:${APPSDK_SRC_VERSION}\",/" js_dependencies.json
 npm install rally-appsdk@${APPSDK_SRC_VERSION} --save --save-exact
 

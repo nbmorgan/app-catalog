@@ -1,5 +1,9 @@
 #!/bin/bash -el
 
+if [ -d "/home/jenkins/.nvm" ]; then
+    source  ~/.nvm/nvm.sh
+fi
+
 npm install
 
 if [ ! -z "$APPSDK_SRC_VERSION" ]; then

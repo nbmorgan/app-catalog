@@ -1,5 +1,9 @@
 #!/bin/bash -el
 
+if [ -d "/home/jenkins/.nvm" ]; then
+    source  ~/.nvm/nvm.sh
+fi
+
 npm install
 grunt nexus:deploy
 grunt nexus:verify
