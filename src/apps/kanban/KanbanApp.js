@@ -41,7 +41,7 @@
                     Completed: {wip: ''},
                     Accepted: {wip: ''}
                 }),
-                cardFields: 'FormattedID,Name,Owner,Discussion,Tasks,Defects', //remove with COLUMN_LEVEL_FIELD_PICKER_ON_KANBAN_SETTINGS
+                cardFields: 'FormattedID,Name,Owner,Discussion,Tasks,Defects',
                 hideReleasedCards: false,
                 showCardAge: true,
                 cardAgeThreshold: 3,
@@ -79,7 +79,6 @@
 
         getSettingsFields: function() {
             return Rally.apps.kanban.Settings.getFields({
-                shouldShowColumnLevelFieldPicker: this._shouldShowColumnLevelFieldPicker(),
                 defaultCardFields: this.getSetting('cardFields')
             });
         },
@@ -93,10 +92,6 @@
             this.callParent(arguments);
             this.gridboard.destroy();
             this.launch();
-        },
-
-        _shouldShowColumnLevelFieldPicker: function() {
-            return this.getContext().isFeatureEnabled('COLUMN_LEVEL_FIELD_PICKER_ON_KANBAN_SETTINGS');
         },
 
         _onStoryModelRetrieved: function(model) {
@@ -200,27 +195,12 @@
                         }
                     }
                 };
-                if(this._shouldShowColumnLevelFieldPicker()) {
-                    columnConfig.fields = this._getFieldsForColumn(values);
-                }
                 columns.push(columnConfig);
             }, this);
 
             columns[columns.length - 1].hideReleasedCards = this.getSetting('hideReleasedCards');
 
             return columns;
-        },
-
-        _getFieldsForColumn: function(values) {
-            var columnFields = [];
-            if (this._shouldShowColumnLevelFieldPicker()) {
-                if (values.cardFields) {
-                    columnFields = values.cardFields.split(',');
-                } else if (this.getSetting('cardFields')) {
-                    columnFields = this.getSetting('cardFields').split(',');
-                }
-            }
-            return columnFields;
         },
 
         _onInvalidFilter: function() {
