@@ -22,8 +22,7 @@
             'Rally.ui.combobox.ComboBox',
             'Rally.ui.TextField',
             'Rally.ui.combobox.FieldValueComboBox',
-            'Rally.ui.plugin.FieldValidationUi',
-            'Rally.apps.kanban.ColumnCardFieldPicker'
+            'Rally.ui.plugin.FieldValidationUi'
         ],
 
         fieldSubTpl: '<div id="{id}" class="settings-grid"></div>',
@@ -54,7 +53,7 @@
             this.callParent(arguments);
 
             this._store = Ext.create('Ext.data.Store', {
-                fields: ['column', 'shown', 'wip', 'scheduleStateMapping', 'cardFields'],
+                fields: ['column', 'shown', 'wip', 'scheduleStateMapping'],
                 data: []
             });
 
@@ -141,37 +140,6 @@
                 }
             ];
 
-            if (this.shouldShowColumnLevelFieldPicker) {
-                columns.push({
-                    text: 'Fields',
-                    dataIndex: 'cardFields',
-                    width: 300,
-                    tdCls: Rally.util.Test.toBrowserTestCssClass('cardfields', ''),
-                    renderer: this._getRendererForCardFields,
-                    scope: this,
-                    editor: {
-                        xtype: 'kanbancolumncardfieldpicker',
-                        cls: 'card-fields',
-                        margin: 0,
-                        modelTypes: ['UserStory', 'Defect'],
-                        autoExpand: true,
-                        alwaysExpanded: false,
-                        hideTrigger: true,
-                        fieldBlackList: ['DisplayColor'],
-                        alwaysSelectedValues: ['FormattedID', 'Name', 'Owner'],
-                        storeConfig: {
-                            autoLoad: false
-                        },
-                        listeners: {
-                            selectionchange: function (picker) {
-                                picker.validate();
-                            },
-                            rightactionclick: this._updateColumnCardFieldSettings,
-                            scope: this
-                        }
-                    }
-                });
-            }
             return columns;
         },
 
@@ -185,14 +153,6 @@
             var data = {};
             data[this.name] = Ext.JSON.encode(this._buildSettingValue());
             return data;
-        },
-
-        _getRendererForCardFields: function(fields) {
-            var valWithoutPrefixes = [];
-            Ext.Array.each(this._getCardFields(fields), function(field) {
-                valWithoutPrefixes.push(field.replace(/^c_/, ''));
-            });
-            return valWithoutPrefixes.join(', ');
         },
 
         _getCardFields: function(fields) {
@@ -235,10 +195,6 @@
                         wip: record.get('wip'),
                         scheduleStateMapping: record.get('scheduleStateMapping')
                     };
-                    if (this.shouldShowColumnLevelFieldPicker) {
-                        var cardFields = this._getCardFields(record.get('cardFields'));
-                        columns[record.get('column')].cardFields = cardFields.join(',');
-                    }
                 }
             }, this);
             return columns;
@@ -293,12 +249,6 @@
                     wip: pref.wip,
                     scheduleStateMapping: pref.scheduleStateMapping
                 });
-
-                if (pref.cardFields) {
-                    Ext.apply(column, {
-                        cardFields: pref.cardFields
-                    });
-                }
             }
 
             return column;

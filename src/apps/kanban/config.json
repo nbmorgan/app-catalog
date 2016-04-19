@@ -6,7 +6,6 @@
    "javascript": [
       "../common/RowSettingsField.js",
       "Column.js",
-      "ColumnCardFieldPicker.js",
       "ColumnSettingsField.js",
       "Settings.js",
       "KanbanApp.js"

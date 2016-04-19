@@ -112,66 +112,6 @@ describe 'Rally.apps.kanban.KanbanApp', ->
       expect(columns[0].wipLimit).toBe columnSettings.Defined.wip
       expect(columns[1].wipLimit).toBe columnSettings['In-Progress'].wip
 
-  it 'should show columns with correct card fields when COLUMN_LEVEL_FIELD_PICKER_ON_KANBAN_SETTINGS enabled', ->
-    @stub(Rally.app.Context.prototype, 'isFeatureEnabled').withArgs('COLUMN_LEVEL_FIELD_PICKER_ON_KANBAN_SETTINGS').returns(true)
-    columnSettings =
-      Defined:
-        cardFields: 'Name,Defects,Project'
-      'In-Progress':
-        cardFields: 'ScheduleState'
-
-    @createApp({columns: Ext.JSON.encode(columnSettings)}).then =>
-      columns = @cardboard.getColumns()
-
-      expect(columns.length).toBe 2
-      expect(columns[0].cardConfig.fields).toBeUndefined()
-      expect(columns[0].fields).toEqual columnSettings.Defined.cardFields.split(',')
-      expect(columns[1].fields).toEqual columnSettings['In-Progress'].cardFields.split(',')
-      expect(columns[1].cardConfig.fields).toBeUndefined()
-
-  it 'should show columns with cardFields when no column.cardFields settings', ->
-    @stub(Rally.app.Context.prototype, 'isFeatureEnabled').withArgs('COLUMN_LEVEL_FIELD_PICKER_ON_KANBAN_SETTINGS').returns(true)
-    columnSettings =
-      Defined:
-        wip: 1
-      'In-Progress':
-        wip: 2
-
-    @createApp({cardFields: 'foobar', columns: Ext.JSON.encode(columnSettings)}).then =>
-      columns = @cardboard.getColumns()
-
-      expect(columns.length).toBe 2
-      expect(columns[0].fields).toEqual ['foobar']
-      expect(columns[1].fields).toEqual ['foobar']
-
-  it 'should show columns with defaultCardFields when no cardFields or column.cardFields settings', ->
-    @stub(Rally.app.Context.prototype, 'isFeatureEnabled').withArgs('COLUMN_LEVEL_FIELD_PICKER_ON_KANBAN_SETTINGS').returns(true)
-    columnSettings =
-      Defined:
-        wip: 1
-      'In-Progress':
-        wip: 2
-    @createApp({columns: Ext.JSON.encode(columnSettings)}).then =>
-      columns = @cardboard.getColumns()
-
-      expect(columns.length).toBe 2
-      expect(columns[0].fields).toEqual @app.getSetting('cardFields').split(',')
-      expect(columns[1].fields).toEqual @app.getSetting('cardFields').split(',')
-
-  it 'should not specify any card fields to show when COLUMN_LEVEL_FIELD_PICKER_ON_KANBAN_SETTINGS is off (should let card field picker plugin control it)', ->
-    @stub(Rally.app.Context.prototype, 'isFeatureEnabled').withArgs('COLUMN_LEVEL_FIELD_PICKER_ON_KANBAN_SETTINGS').returns(false)
-    columnSettings =
-      Defined:
-        wip: 1
-      'In-Progress':
-        wip: 2
-    @createApp({columns: Ext.JSON.encode(columnSettings)}).then =>
-      columns = @cardboard.getColumns()
-      expect(columns.length).toBe 2
-      _.each columns, (column) =>
-        expect(column.fields).toEqual @app.getSetting('cardFields').split(',')
-        expect(column.cardConfig.fields).toBeUndefined()
-
   it 'should contain menu options', ->
     @createApp().then =>
       options = @app.getOptions()
