@@ -26,7 +26,10 @@
         },
 
         onScopeChange: function(scope) {
-            this.down('#cards').getEl().setHTML('');
+            var cardEl = this.down('#cards').getEl();
+            if (cardEl) {
+                cardEl.setHTML('');
+            }
             this._loadStories(scope);
         },
 
