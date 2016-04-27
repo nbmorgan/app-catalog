@@ -25,21 +25,6 @@
             }]);
         },
 
-        addGridBoard: function () {
-            if (this._isInlineFitleringEnabled()) {
-                this.callParent(arguments);
-            } else {
-                if (this.gridboard && this.workspacePicker && this.workspacePicker.rendered) {
-                    this.workspacePicker.up().remove(this.workspacePicker, false);
-                }
-
-                this.callParent(arguments);
-
-                var leftHeader = this.gridboard.getHeader().getLeft();
-                leftHeader.insert(leftHeader.items.indexOf(leftHeader.down('#gridBoardFilterControlCt')) + 1, this.workspacePicker);
-            }
-        },
-
         getGridConfig: function () {
             return _.merge(this.callParent(arguments), {
                 enableBulkEdit: false,
@@ -49,18 +34,6 @@
                     }
                 }
             });
-        },
-
-        getPermanentFilters: function () {
-            if (this._isInlineFitleringEnabled()) {
-                return this.callParent(arguments);
-            }
-
-            return this._getSelectedWorkspace() ? [{
-                property: 'WorkspacePermission',
-                operator: '!=',
-                value: 'No Access'
-            }] : [];
         },
 
         getFieldPickerConfig: function () {
@@ -76,21 +49,6 @@
                 appID: this.getContext().getAppId(),
                 filterByUser: true
             });
-        },
-
-        loadModelNames: function () {
-            if (this._isInlineFitleringEnabled()) {
-                return this.callParent();
-            } else {
-                return this._createWorkspacePicker().then({
-                    success: function () {
-                        this.workspacePicker.on('select', this._onWorkspaceSelect, this);
-                        this._setWorkspaceOnContext();
-                        return this.modelNames;
-                    },
-                    scope: this
-                });
-            }
         },
 
         _createWorkspacePicker: function () {
@@ -148,12 +106,7 @@
         },
 
         getAddNewConfig: function () {
-            var config = {};
-            if (this._isInlineFitleringEnabled()) {
-                config.margin = 0;
-            }
-
-            return _.merge(this.callParent(arguments), config);
+            return _.merge(this.callParent(arguments), {margin:0});
         },
 
         getGridBoardConfig: function () {
@@ -168,10 +121,6 @@
             });
         },
 
-        _isInlineFitleringEnabled: function(){
-            return this.getContext().isFeatureEnabled('S108179_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_USERS');
-        },
-
         getGridBoardCustomFilterControlConfig: function () {
             var blackListFields = ['ArtifactSearch', 'ModelType', 'SubscriptionID'];
             var whiteListFields = [];
@@ -184,82 +133,62 @@
                 displayName: 'Workspace Scope'
             }];
 
-            if (this._isInlineFitleringEnabled()) {
-                return {
-                    ptype: 'rallygridboardinlinefiltercontrol',
-                    inlineFilterButtonConfig: {
-                        stateful: true,
-                        stateId: this.getScopedStateId('inline-filter'),
-                        model: this.models[0],
-                        inlineFilterPanelConfig: {
-                            quickFilterPanelConfig: {
-                                defaultFields: defaultFields,
-                                addQuickFilterConfig: {
+            return {
+                ptype: 'rallygridboardinlinefiltercontrol',
+                inlineFilterButtonConfig: {
+                    stateful: true,
+                    stateId: this.getScopedStateId('inline-filter'),
+                    model: this.models[0],
+                    inlineFilterPanelConfig: {
+                        quickFilterPanelConfig: {
+                            defaultFields: defaultFields,
+                            addQuickFilterConfig: {
+                                blackListFields: blackListFields,
+                                whiteListFields: whiteListFields,
+                                additionalFields: additionalFields
+                            }
+                        },
+                        advancedFilterPanelConfig: {
+                            advancedFilterRowsConfig: {
+                                propertyFieldConfig: {
                                     blackListFields: blackListFields,
                                     whiteListFields: whiteListFields,
-                                    additionalFields: additionalFields
+                                    width: 185
                                 }
-                            },
-                            advancedFilterPanelConfig: {
-                                advancedFilterRowsConfig: {
-                                    propertyFieldConfig: {
-                                        blackListFields: blackListFields,
-                                        whiteListFields: whiteListFields,
-                                        width: 185
-                                    }
-                                }
-                            },
-                            getFilters: function() {
-                                var matchType = this.getMatchType(),
-                                    filters = [].concat(this.getQuickFilters()).concat(this.getAdvancedFilters()),
-                                    workspaceScopeFilter = _.find(filters, { name: 'WorkspaceScope'});
-
-                                if (workspaceScopeFilter && workspaceScopeFilter.property !== 'WorkspacePermission' && matchType !== 'CUSTOM') {
-                                    filters = _.reject(filters, { name: 'WorkspaceScope'} );
-                                }
-
-                                return filters;
                             }
-                        }
-                    }
-                };
-            }
+                        },
+                        getFilters: function() {
+                            var matchType = this.getMatchType(),
+                                filters = [].concat(this.getQuickFilters()).concat(this.getAdvancedFilters()),
+                                workspaceScopeFilter = _.find(filters, { name: 'WorkspaceScope'});
 
-            return {
-                showUserFilter: true,
-                userFilterConfig: {
-                    stateful: true,
-                    stateId: this.getScopedStateId('user-user-filter'),
-                    storeConfig:{
-                        pageSize: 25,
-                        fetch: ['UserName'],
-                        autoLoad: true
+                            if (workspaceScopeFilter && workspaceScopeFilter.property !== 'WorkspacePermission' && matchType !== 'CUSTOM') {
+                                filters = _.reject(filters, { name: 'WorkspaceScope'} );
+                            }
+
+                            return filters;
+                        }
                     }
                 }
             };
         },
 
         getSharedViewConfig: function() {
-            var context = this.getContext();
-            if (context.isFeatureEnabled('S108179_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_USERS')) {
-                return {
-                    ptype: 'rallygridboardsharedviewcontrol',
-                    sharedViewConfig: {
-                        stateful: true,
-                        stateId: this.getScopedStateId('shared-view'),
-                        enableUrlSharing: this.isFullPageApp !== false,
-                        enableProjectSharing: false,
-                        defaultViews: _.map(this._getDefaultViews(), function(view){
-                            Ext.apply(view, {
-                                Value: Ext.JSON.encode(view.Value, true)
-                            });
-                            return view;
-                        }, this)
-                    }
-                };
-            }
-
-            return {};
+            return {
+                ptype: 'rallygridboardsharedviewcontrol',
+                sharedViewConfig: {
+                    stateful: true,
+                    stateId: this.getScopedStateId('shared-view'),
+                    enableUrlSharing: this.isFullPageApp !== false,
+                    enableProjectSharing: false,
+                    defaultViews: _.map(this._getDefaultViews(), function(view){
+                        Ext.apply(view, {
+                            Value: Ext.JSON.encode(view.Value, true)
+                        });
+                        return view;
+                    }, this)
+                }
+            };
         },
 
         _getDefaultViews: function() {

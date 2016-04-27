@@ -61,9 +61,6 @@ describe 'Rally.apps.timeboxes.TimeboxesApp', ->
     beforeEach ->
       @createApp 'milestone'
 
-    it 'should have the correct App ID', ->
-      expect(@app.getAppId()).toBe -200004
-
     it 'should filter by current project', ->
       expect(@requestStubs.milestone.lastCall.args[0].params.query).toBe "((Projects contains \"#{@app.getContext().getProjectRef()}\") OR (TargetProject = null))"
 
@@ -76,9 +73,6 @@ describe 'Rally.apps.timeboxes.TimeboxesApp', ->
   describe 'iterations', ->
     beforeEach ->
       @createApp 'iteration'
-
-    it 'should have the correct App ID', ->
-      expect(@app.getAppId()).toBe -200013
 
     it 'should not add a query filter', ->
       expect(@requestStubs.iteration.lastCall.args[0].params.query).toBeEmpty()
@@ -95,9 +89,6 @@ describe 'Rally.apps.timeboxes.TimeboxesApp', ->
   describe 'releases', ->
     beforeEach ->
       @createApp 'release'
-
-    it 'should have the correct App ID', ->
-      expect(@app.getAppId()).toBe -200012
 
     it 'should not add a query filter', ->
       expect(@requestStubs.release.lastCall.args[0].params.query).toBeEmpty()
@@ -123,7 +114,7 @@ describe 'Rally.apps.timeboxes.TimeboxesApp', ->
         @waitForComponentReady @app
 
     it 'make a request for the new type', ->
-      expect(@requestStubs.iteration).not.toHaveBeenCalled()
+      expect(@requestStubs.iteration.callCount).not.toHaveBeenCalled()
       expect(@requestStubs.release).toHaveBeenCalledOnce()
 
   describe 'gridboard store data changed', ->
@@ -159,7 +150,6 @@ describe 'Rally.apps.timeboxes.TimeboxesApp', ->
 
   describe 'in chart mode', ->
     beforeEach ->
-      @stubFeatureToggle ['S108174_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_TIMEBOXES'], true
       @createApp 'iteration', toggleState: 'chart'
 
     it 'should disable non-applicable header controls', ->
@@ -181,18 +171,16 @@ describe 'Rally.apps.timeboxes.TimeboxesApp', ->
         _.find gridBoard.plugins, (plugin) ->
           plugin.ptype == filterptype
 
-    it 'should have the old filter component by default', ->
+    it 'should nothave the old filter component', ->
       @createApp().then =>
-        expect(@getPlugin('rallygridboardcustomfiltercontrol')).toBeDefined()
+        expect(@getPlugin('rallygridboardcustomfiltercontrol')).not.toBeDefined()
 
     it 'should use rallygridboard filtering plugin', ->
-      @stubFeatureToggle ['S108174_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_TIMEBOXES'], true
       @createApp().then =>
         expect(@getPlugin()).toBeDefined()
 
     describe 'quick filters', ->
       it 'should add filters for search', ->
-        @stubFeatureToggle ['S108174_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_TIMEBOXES'], true
         @createApp().then =>
           config = @getPlugin().inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig
           expect(config.defaultFields[0]).toBe 'ArtifactSearch'
@@ -206,19 +194,12 @@ describe 'Rally.apps.timeboxes.TimeboxesApp', ->
         _.find gridBoard.plugins, (plugin) ->
           plugin.ptype == 'rallygridboardsharedviewcontrol'
 
-    it 'should not have shared view plugin if the toggle is off', ->
-      @createApp().then =>
-        gridBoard = @app.down 'rallygridboard'
-        expect(@getPlugin()).not.toBeDefined()
-
     it 'should configure gridboard with sharedViewAdditionalCmps', ->
-      @stubFeatureToggle ['S108174_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_TIMEBOXES'], true
       @createApp().then =>
         expect(@app.gridboard.sharedViewAdditionalCmps.length).toBe 1
         expect(@app.gridboard.sharedViewAdditionalCmps[0]).toBe @app.modelPicker
 
-    it 'should use rallygridboard shared view plugin if toggled on', ->
-      @stubFeatureToggle ['S108174_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_TIMEBOXES'], true
+    it 'should use rallygridboard shared view plugin', ->
       @createApp().then =>
         plugin = @getPlugin()
         expect(plugin).toBeDefined()
@@ -228,7 +209,6 @@ describe 'Rally.apps.timeboxes.TimeboxesApp', ->
         expect(plugin.sharedViewConfig.suppressViewNotFoundNotification).not.toBeDefined()
 
     it 'should load gridboard with suppressViewNotFoundNotification set to true after PI type change', ->
-      @stubFeatureToggle ['S108174_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_TIMEBOXES'], true
       @createApp().then =>
         @stub(@getPlugin().controlCmp, 'getSharedViewParam').returns true
         @changeType('release')
@@ -236,7 +216,6 @@ describe 'Rally.apps.timeboxes.TimeboxesApp', ->
           condition: => @getPlugin().sharedViewConfig.suppressViewNotFoundNotification
 
     it 'sets current view on viewchange', ->
-      @stubFeatureToggle ['S108174_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_TIMEBOXES'], true
       @createApp().then =>
         loadSpy = @spy(@app, 'loadGridBoard')
         @app.gridboard.fireEvent 'viewchange'
@@ -244,7 +223,6 @@ describe 'Rally.apps.timeboxes.TimeboxesApp', ->
         expect(@app.down('#gridBoard')).toBeDefined()
 
     it 'should enableUrlSharing when isFullPageApp is true', ->
-      @stubFeatureToggle ['S108174_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_TIMEBOXES'], true
       @createApp(
          null,
          isFullPageApp: true
@@ -252,7 +230,6 @@ describe 'Rally.apps.timeboxes.TimeboxesApp', ->
         expect(@getPlugin().sharedViewConfig.enableUrlSharing).toBe true
 
     it 'should NOT enableUrlSharing when isFullPageApp is false', ->
-      @stubFeatureToggle ['S108174_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_TIMEBOXES'], true
       @createApp(
          null,
         isFullPageApp: false

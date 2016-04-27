@@ -142,15 +142,10 @@ describe 'Rally.apps.portfoliokanban.PortfolioKanbanApp', ->
     @_createApp().then =>
       gridBoard = @app.down 'rallygridboard'
       plugin = _.find gridBoard.plugins, (plugin) ->
-        plugin.ptype == 'rallygridboardcustomfiltercontrol'
+        plugin.ptype == 'rallygridboardinlinefiltercontrol'
       expect(plugin).toBeDefined()
-      expect(plugin.filterControlConfig.stateful).toBe true
-      expect(plugin.filterControlConfig.stateId).toBe @app.getContext().getScopedStateId('portfolio-kanban-custom-filter-button')
-
-      expect(plugin.showOwnerFilter).toBe true
-      expect(plugin.ownerFilterControlConfig.stateful).toBe true
-      expect(plugin.ownerFilterControlConfig.stateId).toBe @app.getContext().getScopedStateId('portfolio-kanban-owner-filter')
-
+      expect(plugin.inlineFilterButtonConfig.stateful).toBe true
+      expect(plugin.inlineFilterButtonConfig.stateId).toBe @app.getContext().getScopedStateId('portfolio-items-inline-filter')
 
 # These are commented out due to DE22270.
 # Once DE22270 is fixed, uncomment these and they should pass!
@@ -265,9 +260,6 @@ describe 'Rally.apps.portfoliokanban.PortfolioKanbanApp', ->
           fieldsFn = @app.getSettingsFields()[0].isAllowedFieldFn
           expect(fieldsFn(@field)).toBeTruthy()
           expect(fieldsFn(@multiValueCustomField)).toBeFalsy()
-
-
-
 
   describe 'sizing', ->
     it 'should set an initial gridboard height', ->

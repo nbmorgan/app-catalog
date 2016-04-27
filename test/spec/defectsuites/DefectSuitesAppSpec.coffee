@@ -20,11 +20,6 @@ describe 'Rally.apps.defectsuites.DefectSuitesApp', ->
         height: 400
       @waitForComponentReady @app
 
-    stubFeatureToggle: (toggles, value = true) ->
-      stub = @stub(Rally.app.Context.prototype, 'isFeatureEnabled');
-      stub.withArgs(toggle).returns(value) for toggle in toggles
-      stub
-
   beforeEach ->
     @ajax.whenQuerying('artifact').respondWith(@mom.getData('defectsuite', count: 5))
 
@@ -38,12 +33,11 @@ describe 'Rally.apps.defectsuites.DefectSuitesApp', ->
         _.find gridBoard.plugins, (plugin) ->
           plugin.ptype == filterptype
 
-    it 'should have the old filter component by default', ->
+    it 'should not have the old filter component', ->
       @createApp().then =>
-        expect(@getPlugin('rallygridboardcustomfiltercontrol')).toBeDefined()
+        expect(@getPlugin('rallygridboardcustomfiltercontrol')).not.toBeDefined()
 
     it 'should use rallygridboard filtering plugin', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp().then =>
         expect(@getPlugin()).toBeDefined()
 
@@ -54,12 +48,7 @@ describe 'Rally.apps.defectsuites.DefectSuitesApp', ->
         _.find gridBoard.plugins, (plugin) ->
           plugin.ptype == filterptype
 
-    it 'should not have shared view plugin if the toggle is off', ->
-      @createApp().then =>
-        expect(@getPlugin()).not.toBeDefined()
-
-    it 'should use rallygridboard shared view plugin if toggled on', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
+    it 'should use rallygridboard shared view plugin', ->
       @createApp().then =>
         plugin = @getPlugin()
         expect(plugin).toBeDefined()
@@ -67,7 +56,6 @@ describe 'Rally.apps.defectsuites.DefectSuitesApp', ->
         expect(plugin.sharedViewConfig.stateId).toBe @app.getContext().getScopedStateId('defect-suites-shared-view')
 
     it 'sets current view on viewchange', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp().then =>
         loadSpy = @spy(@app, 'loadGridBoard')
         @app.gridboard.fireEvent 'viewchange'
@@ -75,7 +63,6 @@ describe 'Rally.apps.defectsuites.DefectSuitesApp', ->
         expect(@app.down('#gridBoard')).toBeDefined()
 
     it 'contains default view', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp().then =>
         plugin = @getPlugin()
         expect(plugin.controlCmp.defaultViews.length).toBe 1

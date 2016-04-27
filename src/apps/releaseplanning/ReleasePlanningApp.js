@@ -74,7 +74,7 @@
                     'UnEstimatedLeafStoryCount'
                 ];
 
-            var plugins = [
+            return [
                 {
                     ptype: 'rallygridboardaddnew',
                     rankScope: 'BACKLOG',
@@ -88,13 +88,9 @@
                     ptype: 'rallygridboardfieldpicker',
                     boardFieldBlackList: boardFieldBlacklist,
                     headerPosition: 'left'
-                }
+                },
+                this._getSharedViewPluginConfig()
             ];
-            if (context.isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
-                plugins.push(this._getSharedViewPluginConfig());
-            }
-            return plugins;
-
         },
 
         _getCustomFilterControlPluginConfig: function() {
@@ -102,58 +98,38 @@
             var blackListFields = ['PortfolioItemType', 'Release', 'ModelType'];
             var whiteListFields = ['Milestones', 'Tags'];
 
-            if (context.isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
-                return {
-                    ptype: 'rallygridboardinlinefiltercontrol',
-                    inlineFilterButtonConfig: {
-                        stateful: true,
-                        stateId: context.getScopedStateId('release-planning-inline-filter'),
-                        legacyStateIds: [
-                            context.getScopedStateId('release-planning-owner-filter'),
-                            context.getScopedStateId('release-planning-custom-filter-button')
-                        ],
-                        filterChildren: false,
-                        modelNames: this._getModelNames(),
-                        inlineFilterPanelConfig: {
-                            quickFilterPanelConfig: {
-                                defaultFields: [
-                                    'ArtifactSearch',
-                                    'Owner',
-                                    'Parent'
-                                ],
-                                addQuickFilterConfig: {
+            return {
+                ptype: 'rallygridboardinlinefiltercontrol',
+                inlineFilterButtonConfig: {
+                    stateful: true,
+                    stateId: context.getScopedStateId('release-planning-inline-filter'),
+                    legacyStateIds: [
+                        context.getScopedStateId('release-planning-owner-filter'),
+                        context.getScopedStateId('release-planning-custom-filter-button')
+                    ],
+                    filterChildren: false,
+                    modelNames: this._getModelNames(),
+                    inlineFilterPanelConfig: {
+                        quickFilterPanelConfig: {
+                            defaultFields: [
+                                'ArtifactSearch',
+                                'Owner',
+                                'Parent'
+                            ],
+                            addQuickFilterConfig: {
+                                blackListFields: blackListFields,
+                                whiteListFields: whiteListFields
+                            }
+                        },
+                        advancedFilterPanelConfig: {
+                            advancedFilterRowsConfig: {
+                                propertyFieldConfig: {
                                     blackListFields: blackListFields,
                                     whiteListFields: whiteListFields
-                                }
-                            },
-                            advancedFilterPanelConfig: {
-                                advancedFilterRowsConfig: {
-                                    propertyFieldConfig: {
-                                        blackListFields: blackListFields,
-                                        whiteListFields: whiteListFields
-                                    }
                                 }
                             }
                         }
                     }
-                };
-            }
-
-            return {
-                ptype: 'rallygridboardcustomfiltercontrol',
-                filterChildren: false,
-                filterControlConfig: {
-                    margin: '3 9 3 30',
-                    blackListFields: ['PortfolioItemType', 'Release'],
-                    whiteListFields: ['Milestones'],
-                    modelNames: this._getModelNames(),
-                    stateful: true,
-                    stateId: context.getScopedStateId('release-planning-custom-filter-button')
-                },
-                showOwnerFilter: true,
-                ownerFilterControlConfig: {
-                    stateful: true,
-                    stateId: context.getScopedStateId('release-planning-owner-filter')
                 }
             };
         },

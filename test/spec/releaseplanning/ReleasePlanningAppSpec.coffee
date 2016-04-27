@@ -79,34 +79,23 @@ describe 'Rally.apps.releaseplanning.ReleasePlanningApp', ->
       sortedReleaseNames = _.pluck _.sortBy(@releaseData, (release) -> new Date(release.ReleaseDate)), 'Name'
       expect(_.map(@getTimeboxColumns(), (column) -> column.getTimeboxRecord().get('Name'))).toEqual sortedReleaseNames
 
-  it 'should use rallygridboard custom filter control', ->
+  it 'should not use rallygridboard custom filter control', ->
     @createApp().then =>
       plugin = @getPlugin 'rallygridboardcustomfiltercontrol'
-      expect(plugin).toBeDefined()
-      expect(plugin.filterControlConfig.stateful).toBe true
-      expect(plugin.filterControlConfig.stateId).toBe @app.getContext().getScopedStateId('release-planning-custom-filter-button')
-
-      expect(plugin.showOwnerFilter).toBe true
-      expect(plugin.ownerFilterControlConfig.stateful).toBe true
-      expect(plugin.ownerFilterControlConfig.stateId).toBe @app.getContext().getScopedStateId('release-planning-owner-filter')
+      expect(plugin).not.toBeDefined()
 
   describe 'filtering panel plugin', ->
-    it 'should have the old filter component by default', ->
+    it 'should not have the old filter component', ->
       @createApp().then =>
-        expect(@getPlugin('rallygridboardcustomfiltercontrol')).toBeDefined()
+        expect(@getPlugin('rallygridboardcustomfiltercontrol')).not.toBeDefined()
 
     it 'should use rallygridboard filtering plugin', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp().then =>
         expect(@getPlugin('rallygridboardinlinefiltercontrol')).toBeDefined()
 
   describe 'shared view plugin', ->
-    it 'should not have shared view plugin if the toggle is off', ->
-      @createApp().then =>
-        expect(@getPlugin('rallygridboardsharedviewcontrol')).not.toBeDefined()
 
-    it 'should use rallygridboard shared view plugin if toggled on', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
+    it 'should use rallygridboard shared view plugin', ->
       @createApp().then =>
         plugin = @getPlugin('rallygridboardsharedviewcontrol')
         expect(plugin).toBeDefined()
@@ -114,7 +103,6 @@ describe 'Rally.apps.releaseplanning.ReleasePlanningApp', ->
         expect(plugin.sharedViewConfig.stateId).toBe @app.getContext().getScopedStateId('release-planning-shared-view')
 
     it 'sets current view on viewchange', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp().then =>
         buildGridBoardSpy = @spy(@app, '_buildGridBoard')
         destroyGridboardSpy = @spy(@app.down('rallygridboard'), 'destroy')
@@ -124,7 +112,6 @@ describe 'Rally.apps.releaseplanning.ReleasePlanningApp', ->
         expect(@app.down 'rallygridboard').toBeDefined()
 
     it 'contains default view', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp().then =>
         plugin = @getPlugin('rallygridboardsharedviewcontrol')
         expect(plugin.controlCmp.defaultViews.length).toBe 1

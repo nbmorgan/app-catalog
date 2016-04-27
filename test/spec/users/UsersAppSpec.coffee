@@ -47,22 +47,6 @@ describe 'Rally.apps.users.UsersApp', ->
       expect(@getPluginOfType('rallysubscriptionseats')).toBeDefined()
       expect(@app.gridboard.getHeader().getLeft().items.last().xtype).toBe 'rallysubscriptionseats'
 
-  describe 'workspace filter', ->
-    beforeEach ->
-      @createApp()
-
-    it 'should not filter by workspace by default', ->
-      expect(@app.gridboard.getGridOrBoard().store).toHaveNoFilters()
-
-    it 'should filter by workspace when one is selected', ->
-      new Helpers.ComboBoxHelper('.user-workspace-picker').openAndSelect(@workspaces[0]._refObjectName).then =>
-        expect(@app.context.getWorkspace().ObjectID).toBe @workspaces[0].ObjectID
-        expect(@app.gridboard.getGridOrBoard().store).toOnlyHaveFilter ['WorkspacePermission', '!=', 'No Access']
-
-    it 'should be to the right of the filter control', ->
-      headerItemIds = _.pluck @app.gridboard.getHeader().getLeft().items.getRange(), 'itemId'
-      expect(headerItemIds.indexOf('gridBoardFilterControlCt')).toBe headerItemIds.indexOf('userWorkspacePicker') - 1
-
   describe '#getScopedStateId', ->
     beforeEach ->
       @createApp()
@@ -74,17 +58,15 @@ describe 'Rally.apps.users.UsersApp', ->
       expect(@app.getScopedStateId()).not.toContain 'workspace'
 
   describe 'filtering panel plugin', ->
-    it 'should have the old filter component by default', ->
+    it 'should not have the old filter component', ->
       @createApp().then =>
-        expect(@getPluginOfType('rallygridboardcustomfiltercontrol')).toBeDefined()
+        expect(@getPluginOfType('rallygridboardcustomfiltercontrol')).not.toBeDefined()
 
     it 'should use rallygridboard filtering plugin', ->
-      @stubFeatureToggle ['S108179_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_USERS'], true
       @createApp().then =>
         expect(@getPluginOfType('rallygridboardinlinefiltercontrol')).toBeDefined()
 
     it 'should set up Search & WorkspaceScope quick filter by default', ->
-      @stubFeatureToggle ['S108179_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_USERS'], true
       @createApp().then =>
         plugin = @getPluginOfType('rallygridboardinlinefiltercontrol')
         defaultFields = plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.defaultFields
@@ -93,7 +75,6 @@ describe 'Rally.apps.users.UsersApp', ->
         expect(defaultFields[1]).toBe 'WorkspaceScope'
 
     it 'should NOT include workspace scope filter when \'All Workspaces\' selected ', ->
-      @stubFeatureToggle ['S108179_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_USERS'], true
       @createApp().then =>
         plugin = @getPluginOfType('rallygridboardinlinefiltercontrol')
         filters = plugin.getControlCmp().inlineFilterButton.getFilters();
@@ -101,7 +82,6 @@ describe 'Rally.apps.users.UsersApp', ->
         expect(workspaceScopeFilter).not.toBeDefined();
 
     it 'should include WorkspaceScope filter when \'Current Workspaces\' selected', ->
-      @stubFeatureToggle ['S108179_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_USERS'], true
       @createApp().then =>
         plugin = @getPluginOfType('rallygridboardinlinefiltercontrol')
         @app.down('rallyworkspacescopefield').setValue('current')
@@ -110,7 +90,6 @@ describe 'Rally.apps.users.UsersApp', ->
         expect(workspaceScopeFilter).toBeDefined();
 
     it 'should include WorkspaceScope filter when \'All Workspaces\' selected and matchType is \'CUSTOM\'', ->
-      @stubFeatureToggle ['S108179_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_USERS'], true
       @createApp().then =>
         plugin = @getPluginOfType('rallygridboardinlinefiltercontrol')
         @app.down('rallymatchtypecombobox').setValue('CUSTOM')
@@ -119,12 +98,7 @@ describe 'Rally.apps.users.UsersApp', ->
         expect(workspaceScopeFilter).toBeDefined();
 
   describe 'shared view plugin', ->
-    it 'should not have shared view plugin if the toggle is off', ->
-      @createApp().then =>
-        expect(@getPluginOfType('rallygridboardsharedviewcontrol')).not.toBeDefined()
-
-    it 'should use rallygridboard shared view plugin if toggled on', ->
-      @stubFeatureToggle ['S108179_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_USERS'], true
+    it 'should use rallygridboard shared view plugin', ->
       @createApp().then =>
         plugin = @getPluginOfType('rallygridboardsharedviewcontrol')
         expect(plugin).toBeDefined()
@@ -132,7 +106,6 @@ describe 'Rally.apps.users.UsersApp', ->
         expect(plugin.sharedViewConfig.stateId).toBe @app.getScopedStateId('shared-view')
 
     it 'sets current view on viewchange', ->
-      @stubFeatureToggle ['S108179_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_USERS'], true
       @createApp().then =>
         loadSpy = @spy(@app, 'loadGridBoard')
         @app.gridboard.fireEvent 'viewchange'
@@ -140,7 +113,6 @@ describe 'Rally.apps.users.UsersApp', ->
         expect(@app.down('#gridBoard')).toBeDefined()
 
     it 'contains default view', ->
-      @stubFeatureToggle ['S108179_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_USERS'], true
       @createApp().then =>
         plugin = @getPluginOfType('rallygridboardsharedviewcontrol')
         expect(plugin.controlCmp.defaultViews.length).toBe 1

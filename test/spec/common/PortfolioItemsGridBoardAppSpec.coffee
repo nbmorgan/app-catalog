@@ -127,29 +127,17 @@ describe 'Rally.apps.common.PortfolioItemsGridBoardApp', ->
         _.find gridBoard.plugins, (plugin) ->
           plugin.ptype == filterptype
 
-    it 'should have the old filter component by default', ->
+    it 'should not have the old filter component', ->
       @renderApp().then =>
-        expect(@getPlugin('rallygridboardcustomfiltercontrol')).toBeDefined()
+        expect(@getPlugin('rallygridboardcustomfiltercontrol')).not.toBeDefined()
 
     it 'should use rallygridboard filtering plugin', ->
-      @stubFeatureToggle ['S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN'], true
       @renderApp().then =>
         expect(@getPlugin()).toBeDefined()
-
-    it 'should set inline false when a full page app', ->
-      @stubFeatureToggle ['S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN'], true
-      @renderApp().then =>
-        expect(@getPlugin().inline).toBe false
-
-    it 'should set inline false when NOT a full page app', ->
-      @stubFeatureToggle ['S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN'], true
-      @renderApp(isFullPageApp: false).then =>
-        expect(@getPlugin().inline).toBe false
 
     describe 'quick filters', ->
 
       it 'should add filters for search and owner', ->
-        @stubFeatureToggle ['S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN'], true
         @renderApp().then =>
           config = @getPlugin().inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig
           expect(config.defaultFields[0]).toBe 'ArtifactSearch'
@@ -163,19 +151,12 @@ describe 'Rally.apps.common.PortfolioItemsGridBoardApp', ->
         _.find gridBoard.plugins, (plugin) ->
           plugin.ptype == 'rallygridboardsharedviewcontrol'
 
-    it 'should not have shared view plugin if the toggle is off', ->
-      @renderApp().then =>
-        gridBoard = @app.down 'rallygridboard'
-        expect(@getPlugin()).not.toBeDefined()
-
     it 'should configure gridboard with sharedViewAdditionalCmps', ->
-      @stubFeatureToggle ['S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN'], true
       @renderApp().then =>
         expect(@app.gridboard.sharedViewAdditionalCmps.length).toBe 1
         expect(@app.gridboard.sharedViewAdditionalCmps[0]).toBe @app.piTypePicker
 
-    it 'should use rallygridboard shared view plugin if toggled on', ->
-      @stubFeatureToggle ['S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN'], true
+    it 'should use rallygridboard shared view plugin', ->
       @renderApp().then =>
         plugin = @getPlugin()
         expect(plugin).toBeDefined()
@@ -187,7 +168,6 @@ describe 'Rally.apps.common.PortfolioItemsGridBoardApp', ->
         expect(plugin.additionalFilters[0].value).toBe '"piTypePicker":"' + @app.piTypePicker.getRecord().get('_refObjectUUID') + '"'
 
     it 'should load gridboard with suppressViewNotFoundNotification set to true after PI type change', ->
-      @stubFeatureToggle ['S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN'], true
       @renderApp().then =>
         @stub(@getPlugin().controlCmp, 'getSharedViewParam').returns true
         @changeType()
@@ -195,7 +175,6 @@ describe 'Rally.apps.common.PortfolioItemsGridBoardApp', ->
           condition: => @getPlugin().sharedViewConfig.suppressViewNotFoundNotification
 
     it 'sets current view on viewchange', ->
-      @stubFeatureToggle ['S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN'], true
       @renderApp().then =>
         loadSpy = @spy(@app, 'loadGridBoard')
         @app.gridboard.fireEvent 'viewchange'
@@ -203,7 +182,6 @@ describe 'Rally.apps.common.PortfolioItemsGridBoardApp', ->
         expect(@app.down('#gridBoard')).toBeDefined()
 
     it 'should add correct rank field when manually ranked', ->
-      @stubFeatureToggle ['S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN'], true
       context = Ext.create('Rally.app.Context',
         initialValues:
           workspace:
@@ -215,7 +193,6 @@ describe 'Rally.apps.common.PortfolioItemsGridBoardApp', ->
         expect(Ext.JSON.decode(defaultViews[0].Value, true).columns[0].dataIndex).toBe 'Rank'
 
     it 'should add correct rank field when dnd ranked', ->
-      @stubFeatureToggle ['S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN'], true
       context = Ext.create('Rally.app.Context',
         initialValues:
           workspace:
@@ -227,14 +204,12 @@ describe 'Rally.apps.common.PortfolioItemsGridBoardApp', ->
         expect(Ext.JSON.decode(defaultViews[0].Value, true).columns[0].dataIndex).toBe 'DragAndDropRank'
 
     it 'should enableUrlSharing when isFullPageApp is true', ->
-      @stubFeatureToggle ['S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN'], true
       @renderApp(
         isFullPageApp: true
       ).then =>
         expect(@getPlugin().sharedViewConfig.enableUrlSharing).toBe true
 
     it 'should NOT enableUrlSharing when isFullPageApp is false', ->
-      @stubFeatureToggle ['S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN'], true
       @renderApp(
         isFullPageApp: false
       ).then =>
