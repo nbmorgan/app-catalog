@@ -114,73 +114,65 @@
 
         getGridBoardCustomFilterControlConfig: function() {
             var context = this.getContext();
-            if (context.isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
-                var isArtifactModel = this.models[0].isArtifact();
-                var blackListFields = isArtifactModel ? ['ModelType', 'PortfolioItemType'] : ['ArtifactSearch', 'ModelType'];
-                var whiteListFields = isArtifactModel ? ['Milestones', 'Tags'] : [];
+            var isArtifactModel = this.models[0].isArtifact();
+            var blackListFields = isArtifactModel ? ['ModelType', 'PortfolioItemType'] : ['ArtifactSearch', 'ModelType'];
+            var whiteListFields = isArtifactModel ? ['Milestones', 'Tags'] : [];
 
-                if (this.models[0].isProject()) {
-                    blackListFields.push('SchemaVersion');
-                } else if (this.models[0].isRelease()) {
-                    blackListFields.push('ChildrenPlannedVelocity', 'Version');
-                }
+            if (this.models[0].isProject()) {
+                blackListFields.push('SchemaVersion');
+            } else if (this.models[0].isRelease()) {
+                blackListFields.push('ChildrenPlannedVelocity', 'Version');
+            }
 
-                var config = {
-                    ptype: 'rallygridboardinlinefiltercontrol',
-                    inlineFilterButtonConfig: {
-                        stateful: true,
-                        stateId: context.getScopedStateId('custom-list-inline-filter'),
-                        legacyStateIds: [
-                            this.getScopedStateId('owner-filter'),
-                            this.getScopedStateId('custom-filter-button')
-                        ],
-                        filterChildren: true,
-                        inlineFilterPanelConfig: {
-                            quickFilterPanelConfig: {
-                                defaultFields: isArtifactModel ? ['ArtifactSearch', 'Owner'] : [],
-                                addQuickFilterConfig: {
+            var config = {
+                ptype: 'rallygridboardinlinefiltercontrol',
+                inlineFilterButtonConfig: {
+                    stateful: true,
+                    stateId: context.getScopedStateId('custom-list-inline-filter'),
+                    legacyStateIds: [
+                        this.getScopedStateId('owner-filter'),
+                        this.getScopedStateId('custom-filter-button')
+                    ],
+                    filterChildren: true,
+                    inlineFilterPanelConfig: {
+                        quickFilterPanelConfig: {
+                            defaultFields: isArtifactModel ? ['ArtifactSearch', 'Owner'] : [],
+                            addQuickFilterConfig: {
+                                blackListFields: blackListFields,
+                                whiteListFields: whiteListFields
+                            }
+                        },
+                        advancedFilterPanelConfig: {
+                            advancedFilterRowsConfig: {
+                                propertyFieldConfig: {
                                     blackListFields: blackListFields,
                                     whiteListFields: whiteListFields
-                                }
-                            },
-                            advancedFilterPanelConfig: {
-                                advancedFilterRowsConfig: {
-                                    propertyFieldConfig: {
-                                        blackListFields: blackListFields,
-                                        whiteListFields: whiteListFields
-                                    }
                                 }
                             }
                         }
                     }
-                };
-
-                if (isArtifactModel) {
-                    config.inlineFilterButtonConfig.modelNames = this.modelNames;
-                } else {
-                    config.inlineFilterButtonConfig.model = this.models[0];
                 }
+            };
 
-                return config;
+            if (isArtifactModel) {
+                config.inlineFilterButtonConfig.modelNames = this.modelNames;
+            } else {
+                config.inlineFilterButtonConfig.model = this.models[0];
             }
 
-            return {};
+            return config;
         },
 
         getSharedViewConfig: function() {
             var context = this.getContext();
-            if (context.isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
-                return {
-                    ptype: 'rallygridboardsharedviewcontrol',
-                    sharedViewConfig: {
-                        stateful: true,
-                        stateId: context.getScopedStateId('custom-list-shared-view'),
-                        enableUrlSharing: this.isFullPageApp !== false
-                    }
-                };
-            }
-
-            return {};
+            return {
+                ptype: 'rallygridboardsharedviewcontrol',
+                sharedViewConfig: {
+                    stateful: true,
+                    stateId: context.getScopedStateId('custom-list-shared-view'),
+                    enableUrlSharing: this.isFullPageApp !== false
+                }
+            };
         },
 
         getGridBoardConfig: function () {
@@ -232,15 +224,12 @@
         getAddNewConfig: function () {
             var config = {
                 minWidth: 700,
-                openEditorAfterAddFailure: false
+                openEditorAfterAddFailure: false,
+                margin: 0
             };
 
             if(!this.getContext().isFeatureEnabled('F6971_REACT_DASHBOARD_PANELS')) {
                 config.disableAddButton = this.appContainer.slug === 'incompletestories';
-            }
-
-            if (this.getContext().isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
-                config.margin = 0;
             }
 
             return _.merge(this.callParent(arguments), config);
@@ -267,37 +256,35 @@
 
         clearFiltersAndSharedViews: function() {
             var context = this.getContext();
-            if (context.isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
-                if (this.gridboard) {
-                    this.gridboard.down('rallyinlinefilterpanel').clear();
-                    this.gridboard.down('rallysharedviewcombobox').reset();
-                }
-
-                Ext.create('Rally.data.wsapi.Store', {
-                    model: Ext.identityFn('preference'),
-                    autoLoad: true,
-                    filters: [
-                        {property: 'AppId', value: context.getAppId()},
-                        {property: 'Type', value: 'View'},
-                        {property: 'Workspace', value: context.getWorkspace()._ref}
-                    ],
-                    context: context.getDataContext(),
-                    listeners: {
-                        load: function(store, records) {
-                            if(!_.isEmpty(records)) {
-                                var batchStore = Ext.create('Rally.data.wsapi.batch.Store', {
-                                    requester: this,
-                                    data: records
-                                });
-                                batchStore.removeAll();
-                                batchStore.sync();
-                            }
-                            store.destroyStore();
-                        },
-                        scope: this
-                    }
-                });
+            if (this.gridboard) {
+                this.gridboard.down('rallyinlinefilterpanel').clear();
+                this.gridboard.down('rallysharedviewcombobox').reset();
             }
+
+            Ext.create('Rally.data.wsapi.Store', {
+                model: Ext.identityFn('preference'),
+                autoLoad: true,
+                filters: [
+                    {property: 'AppId', value: context.getAppId()},
+                    {property: 'Type', value: 'View'},
+                    {property: 'Workspace', value: context.getWorkspace()._ref}
+                ],
+                context: context.getDataContext(),
+                listeners: {
+                    load: function(store, records) {
+                        if(!_.isEmpty(records)) {
+                            var batchStore = Ext.create('Rally.data.wsapi.batch.Store', {
+                                requester: this,
+                                data: records
+                            });
+                            batchStore.removeAll();
+                            batchStore.sync();
+                        }
+                        store.destroyStore();
+                    },
+                    scope: this
+                }
+            });
         },
 
         _getTypeSetting: function() {

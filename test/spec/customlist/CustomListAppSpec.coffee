@@ -112,23 +112,6 @@ describe 'Rally.apps.customlist.CustomListApp', ->
       it 'should not create a grid', ->
         expect(@getGrid()).toBeFalsy()
 
-    describe 'when front side filters are present', ->
-      beforeEach ->
-        @filterState =
-          filters: [
-            '(PercentDoneByStoryPlanEstimate = 1)'
-            '(Name contains "yomama")'
-          ]
-        @createApp(settings: @ext4AppScopedSettings)
-
-      it 'should remove invalid filters', ->
-        expect(@artifactRequest.lastCall.args[0].params.query).not.toContain 'PercentDoneByStoryPlanEstimate'
-        expect(_.any(@app.gridboard.down('rallycustomfilterbutton').getState().filters, (filter) -> _.contains(filter, 'PercentDoneByStoryPlanEstimate'))).toBe false
-
-      it 'should retain valid filters', ->
-        expect(@artifactRequest.lastCall.args[0].params.query).toContain '(Name CONTAINS "yomama")'
-        expect(_.any(@app.gridboard.down('rallycustomfilterbutton').getState().filters, (filter) -> _.contains(filter, '(Name CONTAINS "yomama")'))).toBe true
-
   describe 'grid state columns', ->
     it 'should be overridden by app column settings if different', ->
       @gridState = columns: ['CreationDate', 'AcceptedDate']
@@ -290,17 +273,15 @@ describe 'Rally.apps.customlist.CustomListApp', ->
         _.find gridBoard.plugins, (plugin) ->
           plugin.ptype == filterptype
 
-    it 'should have the old filter component by default', ->
+    it 'should not have the old filter component', ->
       @createApp(settings: { type: 'task' }).then =>
-        expect(@getPlugin('rallygridboardcustomfiltercontrol')).toBeDefined()
+        expect(@getPlugin('rallygridboardcustomfiltercontrol')).not.toBeDefined()
 
     it 'should use rallygridboard filtering plugin', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp(settings: { type: 'task' }).then =>
         expect(@getPlugin()).toBeDefined()
 
     it 'should use appropriate artifact config', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp(settings: { type: 'task' }).then =>
         plugin = @getPlugin()
         expect(plugin.inlineFilterButtonConfig.modelNames).toBeDefined()
@@ -309,7 +290,6 @@ describe 'Rally.apps.customlist.CustomListApp', ->
         expect(plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.addQuickFilterConfig.whiteListFields).toEqual ['Milestones', 'Tags']
 
     it 'should use appropriate nonartifact config', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp(settings: { type: 'user' }).then =>
         plugin = @getPlugin()
         expect(plugin.inlineFilterButtonConfig.model).toBeDefined()
@@ -318,19 +298,16 @@ describe 'Rally.apps.customlist.CustomListApp', ->
         expect(plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.addQuickFilterConfig.whiteListFields).toEqual []
 
     it 'should use appropriate project blacklist config', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp(settings: { type: 'project' }).then =>
         plugin = @getPlugin()
         expect(plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.addQuickFilterConfig.blackListFields).toEqual ['ArtifactSearch', 'ModelType', 'SchemaVersion']
 
     it 'should use appropriate release blacklist config', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp(settings: { type: 'release' }).then =>
         plugin = @getPlugin()
         expect(plugin.inlineFilterButtonConfig.inlineFilterPanelConfig.quickFilterPanelConfig.addQuickFilterConfig.blackListFields).toEqual ['ArtifactSearch', 'ModelType', 'ChildrenPlannedVelocity', 'Version']
 
     it 'should clear primary and secondary no data messages when filterchange is fired', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp(
         settings:
           type: 'project'
@@ -355,12 +332,7 @@ describe 'Rally.apps.customlist.CustomListApp', ->
         if id.split('::')[1] is 'customlist-grid' then return { columns: ['FirstName']}
         if id.split('::')[1] is 'custom-list-shared-view' then return { value: "/preference/1234" }
 
-    it 'should not have shared view plugin if the toggle is off', ->
-      @createApp(settings: { type: 'user' }).then =>
-        expect(@getPlugin()).not.toBeDefined()
-
-    it 'should use rallygridboard shared view plugin if toggled on', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
+    it 'should use rallygridboard shared view plugin', ->
       @createApp(settings: { type: 'user' }).then =>
         plugin = @getPlugin()
         expect(plugin).toBeDefined()
@@ -368,7 +340,6 @@ describe 'Rally.apps.customlist.CustomListApp', ->
         expect(plugin.sharedViewConfig.stateId).toBe @app.getContext().getScopedStateId('custom-list-shared-view')
 
     it 'sets current view on viewchange', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp(settings: { type: 'user' }).then =>
         loadSpy = @spy(@app, 'loadGridBoard')
         @app.gridboard.fireEvent 'viewchange'
@@ -376,65 +347,32 @@ describe 'Rally.apps.customlist.CustomListApp', ->
         expect(@app.down('#gridBoard')).toBeDefined()
 
     it 'uses current view when selected', ->
-      @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
       @createApp(settings: { type: 'user' }).then =>
         expect(_.compact(@getGridColumnNames())).toEqual(['FirstName'])
 
   describe '#clearFiltersAndSharedViews', ->
-    describe 'F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES toggled off', ->
-      beforeEach ->
-        @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], false
 
-      it 'should not clear inline filter panel', ->
-        @createApp(settings: { type: 'user' }).then =>
-          clearSpy = @spy Rally.ui.inlinefilter.InlineFilterPanel::, 'clear'
-          @app.clearFiltersAndSharedViews()
-          expect(clearSpy.callCount).toBe 0
+    it 'should clear inline filter panel', ->
+      @createApp(settings: { type: 'user' }).then =>
+        clearSpy = @spy Rally.ui.inlinefilter.InlineFilterPanel::, 'clear'
+        @app.clearFiltersAndSharedViews()
+        expect(clearSpy.callCount).toBe 1
 
-      it 'should not reset shared view combobox panel', ->
-        @createApp(settings: { type: 'user' }).then =>
-          resetSpy = @spy Rally.ui.gridboard.SharedViewComboBox::, 'reset'
-          @app.clearFiltersAndSharedViews()
-          expect(resetSpy.callCount).toBe 0
+    it 'should reset shared view combobox panel', ->
+      @createApp(settings: { type: 'user' }).then =>
+        resetSpy = @spy Rally.ui.gridboard.SharedViewComboBox::, 'reset'
+        @app.clearFiltersAndSharedViews()
+        expect(resetSpy.callCount).toBe 1
 
-      it 'should not batch remove view records', ->
-        @ajax.whenQuerying('preference').respondWith [
-          Name: 'test view'
-          Value: 'view stuff'
-          Type: 'View'
-          _ref: '/preference/0'
-          AppId: '123'
-        ]
-        @createApp(settings: { type: 'user' }).then =>
-          removeAllStub = @stub Rally.data.wsapi.batch.Store::, 'removeAll'
-          @app.clearFiltersAndSharedViews()
-          @once(condition: => removeAllStub.callCount == 0)
-
-    describe 'F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES toggled on', ->
-      beforeEach ->
-        @stubFeatureToggle ['F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES'], true
-
-      it 'should clear inline filter panel', ->
-        @createApp(settings: { type: 'user' }).then =>
-          clearSpy = @spy Rally.ui.inlinefilter.InlineFilterPanel::, 'clear'
-          @app.clearFiltersAndSharedViews()
-          expect(clearSpy.callCount).toBe 1
-
-      it 'should reset shared view combobox panel', ->
-        @createApp(settings: { type: 'user' }).then =>
-          resetSpy = @spy Rally.ui.gridboard.SharedViewComboBox::, 'reset'
-          @app.clearFiltersAndSharedViews()
-          expect(resetSpy.callCount).toBe 1
-
-      it 'should batch remove view records', ->
-        @ajax.whenQuerying('preference').respondWith [
-          Name: 'test view'
-          Value: 'view stuff'
-          Type: 'View'
-          _ref: '/preference/0'
-          AppId: '123'
-        ]
-        @createApp(settings: { type: 'user' }).then =>
-          removeAllStub = @stub Rally.data.wsapi.batch.Store::, 'removeAll'
-          @app.clearFiltersAndSharedViews()
-          @once condition: => removeAllStub.callCount > 0
+    it 'should batch remove view records', ->
+      @ajax.whenQuerying('preference').respondWith [
+        Name: 'test view'
+        Value: 'view stuff'
+        Type: 'View'
+        _ref: '/preference/0'
+        AppId: '123'
+      ]
+      @createApp(settings: { type: 'user' }).then =>
+        removeAllStub = @stub Rally.data.wsapi.batch.Store::, 'removeAll'
+        @app.clearFiltersAndSharedViews()
+        @once condition: => removeAllStub.callCount > 0

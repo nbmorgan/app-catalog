@@ -1,12 +1,6 @@
 (function () {
     var Ext = window.Ext4 || window.Ext;
 
-    var appIDMap = {
-        milestone: -200004,
-        iteration: -200013,
-        release: -200012
-    };
-
     Ext.define('Rally.apps.timeboxes.TimeboxesApp', {
         extend: 'Rally.app.GridBoardApp',
         requires: [
@@ -51,33 +45,17 @@
                 this._createPicker().then({
                     success: function (selectedType) {
                         this.changeModelType(selectedType);
-                        if(this._isNewestFilteringComponentEnabled()){
-                            this.loadSettingsAndLaunch();
-                        }
+                        this.loadSettingsAndLaunch();
                     },
                     scope: this
                 });
             }
         },
 
-        _isNewestFilteringComponentEnabled: function(){
-            return this.getContext().isFeatureEnabled('S108174_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_TIMEBOXES');
-        },
-
-        _getAppId: function(newType){
-            return this._isNewestFilteringComponentEnabled() ? -200034 : appIDMap[newType];
-        },
-
         changeModelType: function (newType) {
-            this.context = this.getContext().clone({
-                appID: this._getAppId(newType)
-            });
             this.selectedType = newType;
             this.modelNames = [newType];
             this.statePrefix = newType;
-            if(!this._isNewestFilteringComponentEnabled()){
-                this.loadSettingsAndLaunch();
-            }
         },
 
         getGridBoardConfig: function () {
@@ -102,71 +80,60 @@
 
         getGridBoardCustomFilterControlConfig: function () {
             var context = this.getContext();
-            if (this._isNewestFilteringComponentEnabled()) {
-                return {
-                    ptype: 'rallygridboardinlinefiltercontrol',
-                    showInChartMode: false,
-                    inlineFilterButtonConfig: {
-                        stateful: true,
-                        stateId: context.getScopedStateId('timeboxes-inline-filter'),
-                        filterChildren: true,
-                        modelNames: this.modelNames,
-                        inlineFilterPanelConfig: {
-                            quickFilterPanelConfig: {
-                                defaultFields: [
-                                    'ArtifactSearch'
-                                ],
-                                addQuickFilterConfig: {
-                                    blackListFields: ['PortfolioItemType', 'ModelType', 'ChildrenPlannedVelocity'],
+            return {
+                ptype: 'rallygridboardinlinefiltercontrol',
+                showInChartMode: false,
+                inlineFilterButtonConfig: {
+                    stateful: true,
+                    stateId: context.getScopedStateId('timeboxes-inline-filter'),
+                    filterChildren: true,
+                    modelNames: this.modelNames,
+                    inlineFilterPanelConfig: {
+                        quickFilterPanelConfig: {
+                            defaultFields: [
+                                'ArtifactSearch'
+                            ],
+                            addQuickFilterConfig: {
+                                blackListFields: ['PortfolioItemType', 'ModelType', 'ChildrenPlannedVelocity'],
+                                whiteListFields: ['Milestones', 'Tags']
+                            }
+                        },
+                        advancedFilterPanelConfig: {
+                            advancedFilterRowsConfig: {
+                                propertyFieldConfig: {
+                                    blackListFields: ['PortfolioItemType', 'ChildrenPlannedVelocity'],
                                     whiteListFields: ['Milestones', 'Tags']
-                                }
-                            },
-                            advancedFilterPanelConfig: {
-                                advancedFilterRowsConfig: {
-                                    propertyFieldConfig: {
-                                        blackListFields: ['PortfolioItemType', 'ChildrenPlannedVelocity'],
-                                        whiteListFields: ['Milestones', 'Tags']
-                                    }
                                 }
                             }
                         }
                     }
-                };
-            }
-
-            return {
-                blackListFields: ['PortfolioItemType'],
-                whiteListFields: ['Milestones']
+                }
             };
         },
 
         getSharedViewConfig: function() {
             var context = this.getContext();
-            if (this._isNewestFilteringComponentEnabled()) {
-                return {
-                    ptype: 'rallygridboardsharedviewcontrol',
-                    showInChartMode: false,
-                    sharedViewConfig: {
-                        stateful: true,
-                        stateId: context.getScopedStateId('timeboxes-shared-view'),
-                        defaultViews: _.map(this._getDefaultViews(), function (view) {
-                            Ext.apply(view, {
-                                Value: Ext.JSON.encode(view.Value, true)
-                            });
-                            return view;
-                        }, this),
-                        enableUrlSharing: this.isFullPageApp !== false,
-                        suppressViewNotFoundNotification: this._suppressViewNotFoundNotification
-                    },
-                    additionalFilters: [{
-                        property: 'Value',
-                        operator: 'contains',
-                        value: '"timeboxTypePicker":"' + this.modelPicker.getRecord().get('type') + '"'
-                    }]
-                };
-            }
-
-            return {};
+            return {
+                ptype: 'rallygridboardsharedviewcontrol',
+                showInChartMode: false,
+                sharedViewConfig: {
+                    stateful: true,
+                    stateId: context.getScopedStateId('timeboxes-shared-view'),
+                    defaultViews: _.map(this._getDefaultViews(), function (view) {
+                        Ext.apply(view, {
+                            Value: Ext.JSON.encode(view.Value, true)
+                        });
+                        return view;
+                    }, this),
+                    enableUrlSharing: this.isFullPageApp !== false,
+                    suppressViewNotFoundNotification: this._suppressViewNotFoundNotification
+                },
+                additionalFilters: [{
+                    property: 'Value',
+                    operator: 'contains',
+                    value: '"timeboxTypePicker":"' + this.modelPicker.getRecord().get('type') + '"'
+                }]
+            };
         },
 
         _getDefaultViews: function() {
@@ -365,15 +332,13 @@
                 this._suppressViewNotFoundNotificationWhenTypeChanges();
                 this.changeModelType(picker.getValue());
 
-                if(this._isNewestFilteringComponentEnabled()){
-                    var selectedRecord = this.modelPicker.getRecord();
+                var selectedRecord = this.modelPicker.getRecord();
 
-                    if (!this._enableCharts()) {
-                        this.toggleState = 'grid';
-                    }
-
-                    this.gridboard.fireEvent('modeltypeschange', this.gridboard, [selectedRecord]);
+                if (!this._enableCharts()) {
+                    this.toggleState = 'grid';
                 }
+
+                this.gridboard.fireEvent('modeltypeschange', this.gridboard, [selectedRecord]);
             }
         },
 

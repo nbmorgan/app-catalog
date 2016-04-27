@@ -29,12 +29,7 @@
         },
 
         getAddNewConfig: function () {
-            var config = {};
-            if (this.getContext().isFeatureEnabled('S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN')) {
-                config.margin = 0;
-            }
-
-            return _.merge(this.callParent(arguments), config);
+            return _.merge(this.callParent(arguments), {margin: 0});
         },
 
         addGridBoard: function(){
@@ -71,79 +66,64 @@
         },
 
         getGridBoardCustomFilterControlConfig: function () {
-            var context = this.getContext(),
-                skinnyFilter = !!context.isFeatureEnabled('F10466_INLINE_FILTER_UI_ENHANCEMENTS');
+            var context = this.getContext();
 
-            if (context.isFeatureEnabled('S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN')) {
-                return {
-                    ptype: 'rallygridboardinlinefiltercontrol',
-                    inline: skinnyFilter,
-                    skinny: skinnyFilter,
-                    inlineFilterButtonConfig: {
-                        stateful: true,
-                        stateId: context.getScopedStateId('portfolio-items-inline-filter'),
-                        legacyStateIds: [
-                            this.getScopedStateId('owner-filter'),
-                            this.getScopedStateId('custom-filter-button')
-                        ],
-                        filterChildren: true,
-                        modelNames: this.modelNames,
-                        inlineFilterPanelConfig: {
-                            quickFilterPanelConfig: {
-                                defaultFields: [
-                                    'ArtifactSearch',
-                                    'Owner'
-                                ],
-                                addQuickFilterConfig: {
-                                    blackListFields: ['PortfolioItemType', 'ModelType'],
+            return {
+                ptype: 'rallygridboardinlinefiltercontrol',
+                inlineFilterButtonConfig: {
+                    stateful: true,
+                    stateId: context.getScopedStateId('portfolio-items-inline-filter'),
+                    legacyStateIds: [
+                        this.getScopedStateId('owner-filter'),
+                        this.getScopedStateId('custom-filter-button')
+                    ],
+                    filterChildren: true,
+                    modelNames: this.modelNames,
+                    inlineFilterPanelConfig: {
+                        quickFilterPanelConfig: {
+                            defaultFields: [
+                                'ArtifactSearch',
+                                'Owner'
+                            ],
+                            addQuickFilterConfig: {
+                                blackListFields: ['PortfolioItemType', 'ModelType'],
+                                whiteListFields: ['Milestones', 'Tags']
+                            }
+                        },
+                        advancedFilterPanelConfig: {
+                            advancedFilterRowsConfig: {
+                                propertyFieldConfig: {
+                                    blackListFields: ['PortfolioItemType'],
                                     whiteListFields: ['Milestones', 'Tags']
-                                }
-                            },
-                            advancedFilterPanelConfig: {
-                                advancedFilterRowsConfig: {
-                                    propertyFieldConfig: {
-                                        blackListFields: ['PortfolioItemType'],
-                                        whiteListFields: ['Milestones', 'Tags']
-                                    }
                                 }
                             }
                         }
                     }
-                };
-            }
-
-            return {
-                blackListFields: ['PortfolioItemType'],
-                whiteListFields: ['Milestones']
+                }
             };
         },
 
         getSharedViewConfig: function() {
-            var context = this.getContext();
-            if (context.isFeatureEnabled('S105843_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_PORTFOLIO_ITEMS_AND_KANBAN')) {
-                return {
-                    ptype: 'rallygridboardsharedviewcontrol',
-                    sharedViewConfig: {
-                        stateful: true,
-                        stateId: this.getContext().getScopedStateId('portfolio-items-shared-view'),
-                        defaultViews: _.map(this._getDefaultViews(), function (view) {
-                            Ext.apply(view, {
-                                Value: Ext.JSON.encode(view.Value, true)
-                            });
-                            return view;
-                        }, this),
-                        enableUrlSharing: this.isFullPageApp !== false,
-                        suppressViewNotFoundNotification: this._suppressViewNotFoundNotification
-                    },
-                    additionalFilters: [{
-                        property: 'Value',
-                        operator: 'contains',
-                        value: '"piTypePicker":"' + this.piTypePicker.getRecord().get('_refObjectUUID') + '"'
-                    }]
-                };
-            }
-
-            return {};
+            return {
+                ptype: 'rallygridboardsharedviewcontrol',
+                sharedViewConfig: {
+                    stateful: true,
+                    stateId: this.getContext().getScopedStateId('portfolio-items-shared-view'),
+                    defaultViews: _.map(this._getDefaultViews(), function (view) {
+                        Ext.apply(view, {
+                            Value: Ext.JSON.encode(view.Value, true)
+                        });
+                        return view;
+                    }, this),
+                    enableUrlSharing: this.isFullPageApp !== false,
+                    suppressViewNotFoundNotification: this._suppressViewNotFoundNotification
+                },
+                additionalFilters: [{
+                    property: 'Value',
+                    operator: 'contains',
+                    value: '"piTypePicker":"' + this.piTypePicker.getRecord().get('_refObjectUUID') + '"'
+                }]
+            };
         },
 
         getFieldPickerConfig: function () {

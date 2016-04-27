@@ -15,12 +15,7 @@
         statePrefix: 'defectsuites',
 
         getAddNewConfig: function () {
-            var config = {};
-            if (this.getContext().isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
-                config.margin = 0;
-            }
-
-            return _.merge(this.callParent(arguments), config);
+            return _.merge(this.callParent(arguments), {margin: 0});
         },
 
         getGridBoardConfig: function () {
@@ -40,65 +35,58 @@
             var blackListFields = ['ModelType'];
             var whiteListFields = ['Milestones', 'Tags'];
 
-            if (context.isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
-                return {
-                    ptype: 'rallygridboardinlinefiltercontrol',
-                    inlineFilterButtonConfig: {
-                        stateful: true,
-                        stateId: context.getScopedStateId('defect-suites-inline-filter'),
-                        legacyStateIds: [
-                            this.getScopedStateId('owner-filter'),
-                            this.getScopedStateId('custom-filter-button')
-                        ],
-                        filterChildren: true,
-                        modelNames: this.modelNames,
-                        inlineFilterPanelConfig: {
-                            quickFilterPanelConfig: {
-                                defaultFields: [
-                                    'ArtifactSearch',
-                                    'Owner'
-                                ],
-                                addQuickFilterConfig: {
+            return {
+                ptype: 'rallygridboardinlinefiltercontrol',
+                inlineFilterButtonConfig: {
+                    stateful: true,
+                    stateId: context.getScopedStateId('defect-suites-inline-filter'),
+                    legacyStateIds: [
+                        this.getScopedStateId('owner-filter'),
+                        this.getScopedStateId('custom-filter-button')
+                    ],
+                    filterChildren: true,
+                    modelNames: this.modelNames,
+                    inlineFilterPanelConfig: {
+                        quickFilterPanelConfig: {
+                            defaultFields: [
+                                'ArtifactSearch',
+                                'Owner'
+                            ],
+                            addQuickFilterConfig: {
+                                blackListFields: blackListFields,
+                                whiteListFields: whiteListFields
+                            }
+                        },
+                        advancedFilterPanelConfig: {
+                            advancedFilterRowsConfig: {
+                                propertyFieldConfig: {
                                     blackListFields: blackListFields,
                                     whiteListFields: whiteListFields
-                                }
-                            },
-                            advancedFilterPanelConfig: {
-                                advancedFilterRowsConfig: {
-                                    propertyFieldConfig: {
-                                        blackListFields: blackListFields,
-                                        whiteListFields: whiteListFields
-                                    }
                                 }
                             }
                         }
                     }
-                };
-            }
-
-            return {};
+                }
+            };
         },
 
         getSharedViewConfig: function() {
             var context = this.getContext();
-            if (context.isFeatureEnabled('F8943_UPGRADE_TO_NEWEST_FILTERING_SHARED_VIEWS_ON_MANY_PAGES')) {
-                return {
-                    ptype: 'rallygridboardsharedviewcontrol',
-                    sharedViewConfig: {
-                        stateful: true,
-                        stateId: context.getScopedStateId('defect-suites-shared-view'),
-                        defaultViews: _.map(this._getDefaultViews(), function(view) {
-                            Ext.apply(view, {
-                                Value: Ext.JSON.encode(view.Value, true)
-                            });
-                            return view;
-                        }, this),
-                        enableUrlSharing: this.isFullPageApp !== false
-                    }
-                };
-            }
+            return {
+                ptype: 'rallygridboardsharedviewcontrol',
+                sharedViewConfig: {
+                    stateful: true,
+                    stateId: context.getScopedStateId('defect-suites-shared-view'),
+                    defaultViews: _.map(this._getDefaultViews(), function(view) {
+                        Ext.apply(view, {
+                            Value: Ext.JSON.encode(view.Value, true)
+                        });
+                        return view;
+                    }, this),
+                    enableUrlSharing: this.isFullPageApp !== false
+                }
+            };
 
-            return {};
         },
 
         _getDefaultViews: function() {
