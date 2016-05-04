@@ -17,19 +17,16 @@
         scopeType: 'iteration',
         autoScroll: false,
 
-        launch: function() {
-            this.add({
-                xtype: 'container',
-                itemId: 'cards'
-            });
-            this.callParent(arguments);
-        },
-
         onScopeChange: function(scope) {
-            var cardEl = this.down('#cards').getEl();
-            if (cardEl) {
-                cardEl.setHTML('');
+            if (!this.down('#cards')) {
+                this.add({
+                    xtype: 'container',
+                    itemId: 'cards'
+                });
+            } else {
+                this.down('#cards').removeAll(true);
             }
+
             this._loadStories(scope);
         },
 
@@ -58,7 +55,11 @@
                     printCardHtml += '<div class="pb"></div>';
                 }
             }, this);
-            Ext.DomHelper.insertHtml('beforeEnd', this.down('#cards').getEl().dom, printCardHtml);
+
+            this.down('#cards').add({
+                xtype: 'component',
+                html: printCardHtml
+            });
 
             if(Rally.BrowserTest) {
                 Rally.BrowserTest.publishComponentReady(this);
