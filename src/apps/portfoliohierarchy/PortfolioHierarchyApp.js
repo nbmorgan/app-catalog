@@ -70,6 +70,30 @@
 
         },
 
+        getSettingsFields: function () {
+            return [
+                {
+                    type: 'type',
+                    config: {
+                        defaultSelectionPosition: 'first'
+                    }
+                },
+                {
+                    type: 'query',
+                    config: {
+                        plugins: [
+                            {
+                                ptype: 'rallyhelpfield',
+                                helpId: 271
+                            },
+                            'rallyfieldvalidationui'
+                        ]
+                    }
+                }
+            ];
+
+        },
+
         onDestroy: function() {
             this.tooltip.destroy();
             this.callParent(arguments);

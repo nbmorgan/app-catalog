@@ -44,6 +44,15 @@
             });
         },
 
+        getSettingsFields: function () {
+            return [
+                {
+                    type: 'query'
+                }
+            ];
+
+        },
+
         _drawTree: function(model){
             var me = this;
 
