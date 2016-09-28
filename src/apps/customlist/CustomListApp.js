@@ -32,6 +32,9 @@
 
         initComponent: function () {
             this.appName = 'CustomList-' + this.getAppId();
+            if (this.defaultSettings.url) {
+                Ext.apply(this.defaultSettings, { type: this.defaultSettings.url });
+            }
             this.callParent(arguments);
         },
 
@@ -40,7 +43,7 @@
         },
 
         loadModelNames: function () {
-            this.modelNames = _.compact([this._getTypeSetting()]);
+            this.modelNames = _.compact(this.getTypeSetting());
             this._setColumnNames(this._getColumnNamesSetting());
             return Deft.Promise.when(this.modelNames);
         },
@@ -69,7 +72,7 @@
         getGridConfig: function () {
             var config = _.merge(this.callParent(arguments), {
                 allColumnsStateful: true,
-                enableEditing: !_.contains(this.readOnlyGridTypes, this._getTypeSetting().toLowerCase()),
+                enableEditing: _.intersection(this.readOnlyGridTypes, this.getTypeSetting()).length === 0,
                 listeners: {
                     beforestaterestore: this._onBeforeGridStateRestore,
                     beforestatesave: this._onBeforeGridStateSave,
@@ -115,7 +118,7 @@
         getGridBoardCustomFilterControlConfig: function() {
             var context = this.getContext();
             var isArtifactModel = this.models[0].isArtifact();
-            var blackListFields = isArtifactModel ? ['ModelType', 'PortfolioItemType'] : ['ArtifactSearch', 'ModelType'];
+            var blackListFields = isArtifactModel ? ['ModelType', 'PortfolioItemType', 'LastResult'] : ['ArtifactSearch', 'ModelType'];
             var whiteListFields = isArtifactModel ? ['Milestones', 'Tags'] : [];
 
             if (this.models[0].isProject()) {
@@ -241,7 +244,7 @@
                     disabled: !this._userHasPermissionsToEditPanelSettings()
                 },
                 gridAlwaysSelectedValues: function () { return []; },
-                gridFieldBlackList: this._getTypeSetting().toLowerCase() === 'task' ? ['Rank'] : []
+                gridFieldBlackList: this._shouldEnableRanking() ? [] : ['Rank']
             });
         },
 
@@ -287,8 +290,8 @@
             });
         },
 
-        _getTypeSetting: function() {
-            return this.getSetting('type') || this.getSetting('url');
+        getTypeSetting: function() {
+            return (this.getSetting('type') || this.getSetting('url') || '').toLowerCase().split(',');
         },
 
         _getColumnNamesSetting: function() {
@@ -328,11 +331,11 @@
         },
 
         _shouldEnableAddNew: function() {
-            return !_.contains(this.disallowedAddNewTypes, this._getTypeSetting().toLowerCase());
+            return _.intersection(this.disallowedAddNewTypes, this.getTypeSetting()).length === 0;
         },
 
-        _shouldEnableRanking: function(){
-            return this._getTypeSetting().toLowerCase() !== 'task';
+        _shouldEnableRanking: function() {
+            return !_.contains(this.getTypeSetting(), 'task');
         },
 
         _setColumnNames: function (columnNames) {
